@@ -1,9 +1,14 @@
-import React from 'react'
-import './index.css'
+import React from "react";
+import HeroSection from "./components/HeroSection/HeroSection";
+import Footer from "./components/Footer/Footer";
+
 function App() {
   return (
-    <div className='bg-black text-white'>App</div>
-  )
+    <div className="bg-gray-900">
+      <HeroSection />
+      <Footer />
+    </div>
+  );
 }
 
-export default App
+export default App;
