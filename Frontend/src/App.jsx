@@ -1,3 +1,16 @@
+
+import React from "react";
+import HeroSection from "./components/HeroSection/HeroSection";
+import Footer from "./components/Footer/Footer";
+
+function App() {
+  return (
+    <div className="bg-gray-900">
+      <HeroSection />
+      <Footer />
+    </div>
+  );
+
 import React, { Suspense, lazy } from 'react'
 import {BrowserRouter,Routes,Route} from 'react-router-dom'
 import './index.css'
@@ -17,6 +30,7 @@ function App() {
       </Routes>
     </BrowserRouter>
   )
+
 }
 
-export default App
+export default App;
