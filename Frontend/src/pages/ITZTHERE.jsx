@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
+import HeroSection from "./components/HeroSection/HeroSection";
+import Footer from "./components/Footer/Footer";
 
-export default function ITZTHERE() {
+function ITZTHERE() {
   return (
-    <div>
-      
+    <div className="bg-gray-900">
+      <HeroSection />
+      <Footer />
     </div>
-  )
+  );
 }

@@ -1,16 +1,4 @@
 
-import React from "react";
-import HeroSection from "./components/HeroSection/HeroSection";
-import Footer from "./components/Footer/Footer";
-
-function App() {
-  return (
-    <div className="bg-gray-900">
-      <HeroSection />
-      <Footer />
-    </div>
-  );
-
 import React, { Suspense, lazy } from 'react'
 import {BrowserRouter,Routes,Route} from 'react-router-dom'
 import './index.css'
@@ -24,6 +12,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<ITZTHERE />} />
         <Route path="/windo" element={<Windo_landing/>} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
