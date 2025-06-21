@@ -1,8 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "../components/navbar";
 import PlanCard from "../components/PlanCard";
  // Adjust the path as necessary
 function Windo_landing() {
+  const faqs = [
+  { question: "What is your refund policy?", answer: "We offer a 30-day refund policy." },
+  { question: "How do I contact support?", answer: "Email us at support@example.com." },
+  { question: "Can I upgrade later?", answer: "Yes, you can upgrade at any time." }
+];
+
+
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const toggle = (index) => {
+    setOpenIndex(index === openIndex ? null : index);
+  };
+  
+
   const plans = [
   { title: "PERSONAL", desc: "For individuals", color: "bg-pink-600" },
   { title: "BUSINESS", desc: "For professionals", color: "bg-black" },
@@ -57,6 +71,29 @@ function Windo_landing() {
           <div className="w-full h-2 mt-16 bg-fuchsia-800/50 mt-12 mx-auto rounded"></div>
         </div>
       </section>
+
+        <section className="px-8 md:px-32 py-12 bg-gray-50">
+      <h1 className="font-bebas text-6xl mb-10">FAQ</h1>
+      <div className="space-y-4">
+        {faqs.map((faq, index) => (
+          <div key={index} className="border border-gray-300 rounded-xl bg-white shadow">
+            <button
+              className="w-full text-left px-6 py-4 font-semibold flex justify-between items-center"
+              onClick={() => toggle(index)}
+            >
+              {faq.question}
+              <span>{openIndex === index ? "−" : "+"}</span>
+            </button>
+            {openIndex === index && (
+              <div className="px-6 pb-4 text-gray-700">{faq.answer}</div>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+
+    
+
 
 
     </div>
