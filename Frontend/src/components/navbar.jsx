@@ -7,10 +7,10 @@ function Navbar() {
         <img src={logo} alt="Logo" className="w-28 object-contain ml-3" />
 
             <nav className="space-x-16 text-base font-normal flex items-center mr-2 ">
-                <Link to="/windo" className="hover:text-blue-600">Home</Link>
-                <Link to="/about" className="hover:text-blue-600">About Us</Link>
-                <Link to="/login" className="hover:text-blue-600">Login</Link>
-                <Link to="/register" className="hover:text-blue-600">Register</Link>
+                <Link to="/windo" className="hover:text-[#368c89]">Home</Link>
+                <Link to="/about" className="hover:text-[#368c89]">About Us</Link>
+                <Link to="/login" className="hover:text-[#368c89]">Login</Link>
+                <Link to="/register" className="hover:text-[#368c89]">Register</Link>
             </nav>
         </header>
   )

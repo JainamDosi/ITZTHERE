@@ -1,14 +1,14 @@
 import React from "react";
-import HeroSection from "../components/HeroSection/HeroSection";
+import MainLandingPage from "../components/MainLandingPage/MainLandingPage";
 import Footer from "../components/Footer/Footer";
 
-function ITZTHERE() {
+function App() {
   return (
     <div className="bg-gray-900">
-      <HeroSection />
+      <MainLandingPage />
       <Footer />
     </div>
   );
 }
 
-export default ITZTHERE
+export default App;

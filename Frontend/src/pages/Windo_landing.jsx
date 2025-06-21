@@ -32,8 +32,8 @@ function Windo_landing() {
         >
         <h2 className="text-6xl font-bebas leading-snug tracking-wider text-black">
             A BETTER WAY TO <br />
-            <span className="text-[#92C9CC]">ORGANIZE, CENTRALIZE</span> <br />
-            AND <span className="text-[#92C9CC]">SHARE DATA</span>
+            <span className="text-[#2c787c]">ORGANIZE, CENTRALIZE</span> <br />
+            AND <span className="text-[#2c787c]">SHARE DATA</span>
         </h2>
         <button className="mt-2 px-6 py-2 bg-teal-400 text-white rounded-full hover:bg-teal-500 transition">
             Explore Features
@@ -91,8 +91,6 @@ function Windo_landing() {
         ))}
       </div>
     </section>
-
-    
 
 
 

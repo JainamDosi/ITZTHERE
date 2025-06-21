@@ -54,15 +54,18 @@ const MainLandingPage = () => {
       </div>
 
       {/* Tagline */}
-      <div className="px-8 mt-12 font-bold uppercase tracking-[0.05em]">
-        <h1 className="text-4xl font-['Bebas Neue']">WELCOME</h1>
-        <h2 className="text-2xl mt-1 font-['Bebas Neue']">
-          TO THE WORLD OF <span className="text-[#4DA3FF]">BUSINESS</span>
-        </h2>
-        <h2 className="text-2xl font-['Bebas Neue']">
-          <span className="text-[#4DA3FF]">SOLUTIONS</span>, ONE NEED
-        </h2>
-      </div>
+
+              <div className=" flex flex-col w-full h-[75vh] px-8 bg-[url('/bg2.png')] bg-cover bg-center text-center items-center justify-center space-y-4">
+                <h1 className="text-6xl font-bebas tracking-wide">WELCOME</h1>
+                <h1 className="text-6xl font-bebas tracking-wide">
+                  TO THE WORLD OF <span className="text-[#4DA3FF]">BUSINESS</span>
+                </h1>
+                <h1 className="text-6xl font-bebas tracking-wide">
+                  <span className="text-[#4DA3FF]">SOLUTIONS</span>, ONE NEED
+                </h1>
+              </div>
+
+
 
       {/* Cards container */}
       <div className="mt-16 mb-32 flex justify-center">
