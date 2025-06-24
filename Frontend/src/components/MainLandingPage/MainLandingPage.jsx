@@ -43,6 +43,7 @@ const MainLandingPage = () => {
               src={logoImg}
               alt="logo"
               className="w-full h-full object-cover"
+              loading="lazy"
             />
           </div>
           <span className="text-4xl font-light font-[Oswald]">itzthere</span>
@@ -68,7 +69,7 @@ const MainLandingPage = () => {
 
 
       {/* Cards container */}
-      <div className="mt-16 mb-32 flex justify-center">
+      <div className="mt-16 mb-32 flex justify-center p-4">
         <div className="w-[1008px] overflow-hidden">
           <motion.div
             className="flex gap-6"

@@ -1,5 +1,4 @@
-// models/Company.js
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const companySchema = new mongoose.Schema({
   name: { type: String, required: true }, // to ensure user belongs to org
@@ -15,6 +14,7 @@ const companySchema = new mongoose.Schema({
     enum: ["individual", "business", "business-plus"],
     default: "individual",
   },
+  gstin: { type: String, required: true }, // GST number for Indian companies
   createdAt: { type: Date, default: Date.now },
 });
 

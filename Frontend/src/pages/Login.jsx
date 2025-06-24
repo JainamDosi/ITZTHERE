@@ -8,11 +8,13 @@ const Login = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: Add login logic here
+    
     alert('Logged in!');
   };
+  
 
   return (
     //new comment
