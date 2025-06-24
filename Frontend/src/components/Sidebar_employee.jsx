@@ -21,6 +21,7 @@ const Sidebar_employee = () => {
             <p className="text-sm text-gray-500 truncate">info@pakkabill.com</p>
           </div>
           <FiEdit2 className="text-gray-500 cursor-pointer hidden sm:block" />
+          //testing
         </div>
 
         {/* Navigation Menu */}
