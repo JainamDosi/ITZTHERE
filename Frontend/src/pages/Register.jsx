@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import Navbar from '../components/navbar';
+import axios from 'axios';
+
+
 
 const Register = () => {
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     username: '',
     email: '',
@@ -22,10 +26,26 @@ const Register = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     console.log('Form submitted:', form);
-    alert('Registered!');
+    try {
+      const res = await axios.post("http://localhost:3000/api/auth/register/send-otp", {
+        email: form.email,
+      });
+
+      if (res.status === 200) {
+        console.log("OTP Sent:", res.data.message);
+        alert("OTP sent to your email. Please check and continue.");
+      }
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      const msg = error.response?.data?.error || "Failed to send OTP";
+      alert(msg);
+    }finally{
+      setLoading(false);
+    }
   };
 
   return (
@@ -116,7 +136,7 @@ const Register = () => {
                       accept="application/pdf,image/*"
                       onChange={handleChange}
                       className="hidden"
-                      required={!form.companyDoc}
+                      
                     />
                     <label
                       htmlFor="companyDoc"
@@ -155,7 +175,7 @@ const Register = () => {
                     accept="application/pdf,image/*"
                     onChange={handleChange}
                     className="hidden"
-                    required={!form.identityDoc}
+                    
                   />
                   <label
                     htmlFor="identityDoc"
@@ -183,11 +203,18 @@ const Register = () => {
               </label>
             )}
             <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-            >
-              Register
-            </button>
+                type="submit"
+                disabled={loading}
+
+                className={`w-full py-2 rounded font-semibold ${
+                  loading
+                    ? 'bg-blue-300 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                }`}
+              >
+                {loading ? 'Sending OTP...' : 'Register'}
+              </button>
+              
           </form>
         </div>
       </div>
