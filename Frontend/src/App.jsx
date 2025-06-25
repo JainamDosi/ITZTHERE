@@ -1,24 +1,30 @@
+
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './index.css';
 
-import Register from './pages/Register';
-import Login from './pages/Login';
-import Dashboard from './pages/Company-Admin/Dashboard';
-import UserManagement from './pages/Company-Admin/UserManagement';
-import MainLayout from './pages/Company-Admin/MainLayout';
-import UploadFile from './pages/Company-Admin/UploadFile';
-import ManageRequests from './pages/Company-Admin/ManageRequests';
-import MainLayout_Employee from './pages/Company-Employee/MainLayout';
-import Dashboard_Employee from './pages/Company-Employee/Dashboard_Employee';
-import Request_Employee from './pages/Company-Employee/Request_Employee';
+import ITZTHERE from './pages/ITZTHERE'
+import Register from './pages/Register'
+import Login from './pages/Login'
+import Dashboard from './pages/Company-Admin/Dashboard'
+import UserManagement from './pages/Company-Admin/UserManagement'
+import MainLayout from './pages/Company-Admin/MainLayout'
+import UploadFile from './pages/Company-Admin/UploadFile'
+import ManageRequests from './pages/Company-Admin/ManageRequests'
+import MainLayout_Employee from './pages/Company-Employee/MainLayout'
+import Dashboard_Employee from './pages/Company-Employee/Dashboard_Employee'
+import Request_Employee from './pages/Company-Employee/Request_Employee'
+import MainLayout_Client from './pages/Client/MainLayout'
+import Dashboard_Client from './pages/Client/Dashboard_Client'
 
-const Windo_landing = lazy(() => import('./pages/Windo_landing'));
-const ITZTHERE_ = lazy(() => import('./pages/ITZTHERE'));
+const Windo_landing = lazy(() => import('./pages/Windo_landing'))
+const ITZTHERE_ = lazy(() => import('./pages/ITZTHERE'))
+
 
 function App() {
   return (
     <BrowserRouter>
+
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
           <Route path="/" element={<ITZTHERE_ />} />
@@ -42,8 +48,15 @@ function App() {
             <Route path="request-access" element={<Request_Employee />} />
             <Route path="upload" element={<UploadFile />} />
           </Route>
+          //CLient Routes
+        <Route path="/client" element={<MainLayout_Client />}>
+          <Route index element={<Dashboard_Client />} />
+          <Route path="dashboard" element={<Dashboard_Client />} />
+
+          </Route>
         </Routes>
       </Suspense>
+
     </BrowserRouter>
   );
 }

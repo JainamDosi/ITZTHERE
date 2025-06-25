@@ -35,7 +35,7 @@ const Sidebar = () => {
   return (
     <>
       {/* Sidebar */}
-      <div className="bg-white mt-24 ml-2 flex flex-col pb-2 w-32 sm:w-72 px-2 justify-between transition-all duration-300">
+      <div className="bg-white mt-24 ml-2 flex flex-col pb-2 w-32 sm:w-72 px-2 justify-between transition-all duration-300 h-auto">
         <div className="space-y-4 flex flex-col items-center sm:items-start">
           {/* Profile Card */}
           <div className="bg-white rounded-xl shadow p-2 sm:p-4 flex flex-col sm:flex-row items-center sm:items-start sm:gap-3 w-full">
@@ -92,7 +92,7 @@ const Sidebar = () => {
         </div>
 
         {/* Footer */}
-        <div className="space-y-3 flex flex-col items-center sm:items-start w-full mt-6">
+        <div className="space-y-3 flex flex-col items-center sm:items-start w-full mt-4">
           <div className="bg-white rounded-md shadow p-2 text-xs sm:text-sm flex items-center gap-2 text-gray-600 justify-center sm:justify-start w-full">
             <FaCalendar />
             <span className="hidden sm:inline">

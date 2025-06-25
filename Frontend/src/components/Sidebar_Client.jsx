@@ -5,7 +5,7 @@ import { FiEdit2 } from "react-icons/fi";
 import { HiOutlineLockClosed } from "react-icons/hi";
 import { Link, useLocation } from "react-router-dom";
 
-const Sidebar_employee = () => {
+const Sidebar_Client = () => {
   const location = useLocation();
   const pathname = location.pathname;
 
@@ -24,22 +24,16 @@ const Sidebar_employee = () => {
         <div className="bg-white rounded-xl shadow p-2 sm:p-4 flex flex-col sm:flex-row items-center sm:items-start sm:gap-3 w-full">
           <div className="h-10 w-10 sm:h-14 sm:w-14 rounded-full bg-gradient-to-r from-purple-500 to-gray-800" />
           <div className="hidden sm:block flex-1 min-w-0">
-            <h2 className="font-bold text-base truncate">abcd</h2>
-            <p className="text-sm text-gray-500 truncate">info@pakkabill.com</p>
+            <h2 className="font-bold text-base truncate">XYZ</h2>
+            <p className="text-sm text-gray-500 truncate">Client@pakkabill.com</p>
           </div>
           <FiEdit2 className="text-gray-500 cursor-pointer hidden sm:block" />
         </div>
 
         {/* Navigation Menu */}
         <div className="bg-white rounded-xl shadow p-1 sm:p-2 space-y-1 w-full">
-          <Link to="/employee">
-            <MenuItem icon={<FaChartPie />} label="Dashboard" active={pathname === "/employee"} />
-          </Link>
-          <Link to="/employee/request-access">
-            <MenuItem icon={<HiOutlineLockClosed />} label="Request Access" active={pathname === "/employee/request-access"} />
-          </Link>
-          <Link to="/employee/upload">
-            <MenuItem icon={<FaUpload />} label="Upload File" active={pathname === "/employee/upload"} />
+          <Link to="/client">
+            <MenuItem icon={<FaChartPie />} label="Dashboard" active={pathname === "/client"} />
           </Link>
         </div>
 
@@ -85,4 +79,4 @@ const MenuItem = ({ icon, label, active }) => (
   </div>
 );
 
-export default Sidebar_employee;
+export default Sidebar_Client;
