@@ -12,6 +12,8 @@ import ManageRequests from './pages/Company-Admin/ManageRequests'
 import MainLayout_Employee from './pages/Company-Employee/MainLayout'
 import Dashboard_Employee from './pages/Company-Employee/Dashboard_Employee'
 import Request_Employee from './pages/Company-Employee/Request_Employee'
+import MainLayout_Client from './pages/Client/MainLayout'
+import Dashboard_Client from './pages/Client/Dashboard_Client'
 
 const Windo_landing = lazy(() => import('./pages/Windo_landing'))
 const ITZTHERE_ = lazy(() => import('./pages/ITZTHERE'))
@@ -40,6 +42,12 @@ function App() {
           <Route path="dashboard" element={<Dashboard_Employee />} />
           <Route path="request-access" element={<Request_Employee />} />
           <Route path="upload" element={<UploadFile/>} />
+        </Route>
+        //CLient Routes
+        <Route path="/client" element={<MainLayout_Client />}>
+          <Route index element={<Dashboard_Client />} />
+          <Route path="dashboard" element={<Dashboard_Client />} />
+          
         </Route>
 
       </Routes>
