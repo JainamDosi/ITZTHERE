@@ -3,7 +3,7 @@ import { FiLogOut } from "react-icons/fi";
 import logo from "../assets/logo.svg"; // Adjust the path as necessary
 const Header = () => {
   return (
-    <div className="flex items-center fixed top-0 w-full justify-between align-middle px-6 py-4 bg-white mt-2">
+    <div className="flex items-center fixed top-0 w-full justify-between align-middle px-6 py-4 bg-white ">
       
       {/* Logo */}
       <div className="text-3xl font-bold relative">

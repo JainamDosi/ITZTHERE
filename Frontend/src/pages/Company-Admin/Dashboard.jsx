@@ -9,22 +9,22 @@ function Dashboard() {
     <>
       
 
-      <div className="flex  bg-white text-black items-center justify-center ">
+      <div className="flexbg-white text-black items-center justify-center w-full">
         <main className="flex flex-col ">
 
           {/* Top Stat Cards */}
-          <section className="flex flex-wrap gap-9 flex-1">
-            <StatCard icon={<FaFileAlt />} title="Docs Uploaded" value="1253" />
-            <StatCard
-              icon={<FaCloud />}
-              title="Storage"
-              progressBar={{
-                percent: (4253 / 4916) * 100,
-                label: "0.49 GB used of 4916GB",
-              }}
-            />
-            <StatCard icon={<FaUsers />} title="Users" />
-          </section>
+                <section className="flex flex-wrap md:flex-nowrap gap-16 w-11/12">
+                      <StatCard icon={<FaFileAlt />} title="Docs Uploaded" value="1253" />
+                      <StatCard
+                        icon={<FaCloud />}
+                        title="Storage"
+                        progressBar={{
+                          percent: (4253 / 4916) * 100,
+                          label: "0.49 GB used of 4916GB",
+                        }}
+                      />
+                      <StatCard icon={<FaUsers />} title="Users" value="37" />
+                  </section>
 
           {/* Section Wise Storage */}
           <section className="mt-10 w-1/2">
@@ -40,7 +40,7 @@ function Dashboard() {
             </div>
 
             {/* Placeholder for Donut Chart */}
-            <div className="w-40 h-40 rounded-full border-[10px] border-gray-500" />
+            <div className="w-40 h-40 hidden md:block rounded-full border-[10px] border-gray-500" />
           </section>
 
 
