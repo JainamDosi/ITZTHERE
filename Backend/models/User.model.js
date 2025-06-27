@@ -31,6 +31,8 @@ const userSchema = new mongoose.Schema({
     },
   ], // used only if role is 'client'
 
+  verificationDoc: { type: String },
+
   createdAt: { type: Date, default: Date.now },
 });
 

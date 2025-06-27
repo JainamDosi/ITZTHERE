@@ -1,27 +1,16 @@
 import supabase from "../config/supabaseClient.js";
 import fs from "fs";
 
+import { uploadToSupabase } from "../utils/uploadToSupabase.js";
+
 export const uploadFile = async (req, res) => {
-  const file = req.file;
-  const bucket = process.env.SUPABASE_BUCKET;
-
-  if (!file) return res.status(400).json({ error: "No file uploaded" });
-
-  const { data, error } = await supabase.storage
-    .from(bucket)
-    .upload(file.filename, fs.createReadStream(file.path), {
-      contentType: file.mimetype,
-      duplex: "half", // Required for streams in Node
-    });
-
-  fs.unlinkSync(file.path); // Clean up temp file
-
-  if (error) return res.status(500).json({ error: error.message });
-
-  return res.json({
-    path: data.path,
-    publicUrl: `${process.env.SUPABASE_URL}/storage/v1/object/public/${bucket}/${data.path}`,
-  });
+  try {
+    const file = req.file;
+    const result = await uploadToSupabase(file);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 export const getFileUrl = async (req, res) => {
