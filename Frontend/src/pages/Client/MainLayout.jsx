@@ -3,8 +3,10 @@ import React from "react";
 import Header from "../../components/Header";
 import { Outlet } from "react-router-dom";
 import Sidebar_Client from "../../components/Sidebar_Client";
-
+import { useAuth } from "../../context/AuthContext"; // Importing Auth context if needed
 const MainLayout = () => {
+  // You can use the Auth context here if needed
+  const { user } = useAuth();
   return (
     <div className="flex flex-col min-h-screen bg-white text-black">
       {/* Header */}
@@ -14,7 +16,7 @@ const MainLayout = () => {
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         
-          <Sidebar_Client />
+          <Sidebar_Client user={user} />
         
 
         {/* Main Content */}

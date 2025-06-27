@@ -5,7 +5,7 @@ import { FiEdit2 } from "react-icons/fi";
 import { HiOutlineLockClosed } from "react-icons/hi";
 import { Link, useLocation } from "react-router-dom";
 
-const Sidebar_Client = () => {
+const Sidebar_Client = ({user}) => {
   const location = useLocation();
   const pathname = location.pathname;
 
@@ -24,8 +24,8 @@ const Sidebar_Client = () => {
         <div className="bg-white rounded-xl shadow p-2 sm:p-4 flex flex-col sm:flex-row items-center sm:items-start sm:gap-3 w-full">
           <div className="h-10 w-10 sm:h-14 sm:w-14 rounded-full bg-gradient-to-r from-purple-500 to-gray-800" />
           <div className="hidden sm:block flex-1 min-w-0">
-            <h2 className="font-bold text-base truncate">XYZ</h2>
-            <p className="text-sm text-gray-500 truncate">Client@pakkabill.com</p>
+            <h2 className="font-bold text-base truncate">{user.name}</h2>
+            <p className="text-sm text-gray-500 truncate">{user.email}</p>
           </div>
           <FiEdit2 className="text-gray-500 cursor-pointer hidden sm:block" />
         </div>
