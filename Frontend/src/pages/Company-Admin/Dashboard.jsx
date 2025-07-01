@@ -7,8 +7,6 @@ import { FaFileAlt, FaCloud, FaUsers, FaServer } from "react-icons/fa";
 function Dashboard() {
   return (
     <>
-      
-
       <div className="flexbg-white text-black items-center justify-center w-full">
         <main className="flex flex-col ">
 

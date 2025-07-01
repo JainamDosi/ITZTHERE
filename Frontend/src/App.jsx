@@ -19,6 +19,8 @@ import MainLayout_Client from './pages/Client/MainLayout'
 import Dashboard_Client from './pages/Client/Dashboard_Client'
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import FolderFiles from './pages/Company-Admin/FolderFiles';
+import EmployeeFolderPage from './pages/Company-Employee/EmployeeFolderPage';
 
 
 const Windo_landing = lazy(() => import('./pages/Windo_landing'))
@@ -39,13 +41,14 @@ function App() {
             <Route path="/login" element={<Login />} />
 
             {/* Company-Admin Protected Routes */}
-            <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+            <Route element={<ProtectedRoute allowedRoles={['company-admin']} />}>
               <Route path="/main" element={<MainLayout />}>
                 <Route index element={<Dashboard />} />
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="user-management" element={<UserManagement />} />
                 <Route path="upload" element={<UploadFile />} />
                 <Route path="requests" element={<ManageRequests />} />
+                <Route path="folder/:folderId" element={<FolderFiles />} />
               </Route>
             </Route>
 
@@ -56,6 +59,7 @@ function App() {
                 <Route path="dashboard" element={<Dashboard_Employee />} />
                 <Route path="request-access" element={<Request_Employee />} />
                 <Route path="upload" element={<UploadFile />} />
+                <Route path="folder/:folderId" element={<EmployeeFolderPage />} />
               </Route>
             </Route>
 

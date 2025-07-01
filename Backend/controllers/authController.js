@@ -82,6 +82,7 @@ export const verifyRegisterAndCreateUser = async (req, res) => {
         name: companyName,
         gstin,
         verificationDocs: [publicUrl],
+        storagePlan: plan,
       });
 
       console.log("[USER] Creating company-admin user...");
@@ -179,6 +180,7 @@ export const verifyLoginOtp = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // true in production
       sameSite: "lax", // or 'strict'
+      // Adjust this if needed
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
     res.json({
@@ -187,6 +189,7 @@ export const verifyLoginOtp = async (req, res) => {
         email: user.email,
         name: user.name,
         role: user.role,
+        company: user.companyId ? user.companyId.toString() : null,
       },
     });
   } catch (err) {
