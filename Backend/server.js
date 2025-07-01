@@ -5,8 +5,13 @@ import cors from "cors";
 import dotenv from "dotenv";
 import fileRoutes from "./routes/fileRoutes.js";
 import cookieParser from "cookie-parser";
+import UserManagement from "./routes/usermanageRoutes.js";
+import folderRoutes from "./routes/folderRoute.js";
+import accessRequestRoutes from "./routes/accessRequestsRoutes.js";
+
 
 dotenv.config();
+
 const app = express();
 app.use(
   cors({
@@ -19,6 +24,9 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/files", fileRoutes);
+app.use("/api/create-user", UserManagement);
+app.use("/api/folders", folderRoutes);
+app.use("/api/access-requests", accessRequestRoutes);
 
 mongoose.connect(process.env.MONGO_URI).then(() => {
   app.listen(3000, () =>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../components/navbar";
 import PlanCard from "../components/PlanCard";
+import FeatureCarousel from "../components/FeatureCarousel";
  // Adjust the path as necessary
 function Windo_landing() {
   const faqs = [
@@ -51,10 +52,8 @@ function Windo_landing() {
       </section>
 
       {/* Features Placeholder */}
-      <section className="flex justify-center py-12 bg-white">
-        <div className="w-4/5 h-64 bg-gray-300 rounded-lg flex items-center justify-center text-gray-700 text-xl font-medium">
-          Some screens showing product features
-        </div>
+      <section className="flex justify-center px-8 py-5 bg-white">
+        <FeatureCarousel/>
       </section>
 
       {/* Pricing */}
