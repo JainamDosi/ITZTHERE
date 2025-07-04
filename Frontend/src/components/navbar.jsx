@@ -15,7 +15,7 @@ function Navbar() {
         {/* Desktop Nav */}
         <nav className="hidden md:flex space-x-10 text-base font-medium">
           <Link to="/windo" className="hover:text-[#368c89]">Home</Link>
-          <Link to="/about" className="hover:text-[#368c89]">About Us</Link>
+          
           <Link to="/login" className="hover:text-[#368c89]">Login</Link>
           <Link to="/register" className="hover:text-[#368c89]">Register</Link>
         </nav>
@@ -34,7 +34,7 @@ function Navbar() {
       {isOpen && (
         <div className="md:hidden bg-white px-6 pb-4 shadow-sm flex flex-col space-y-4 text-base font-medium">
           <Link to="/windo" onClick={() => setIsOpen(false)} className="hover:text-[#368c89]">Home</Link>
-          <Link to="/about" onClick={() => setIsOpen(false)} className="hover:text-[#368c89]">About Us</Link>
+          
           <Link to="/login" onClick={() => setIsOpen(false)} className="hover:text-[#368c89]">Login</Link>
           <Link to="/register" onClick={() => setIsOpen(false)} className="hover:text-[#368c89]">Register</Link>
         </div>

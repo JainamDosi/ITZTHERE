@@ -21,7 +21,7 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import FolderFiles from './pages/Company-Admin/FolderFiles';
 import EmployeeFolderPage from './pages/Company-Employee/EmployeeFolderPage';
-
+import ClientFolderFiles from './pages/Client/ClientFolderFiles';
 
 const Windo_landing = lazy(() => import('./pages/Windo_landing'))
 const ITZTHERE_ = lazy(() => import('./pages/ITZTHERE'))
@@ -68,6 +68,7 @@ function App() {
               <Route path="/client" element={<MainLayout_Client />}>
                 <Route index element={<Dashboard_Client />} />
                 <Route path="dashboard" element={<Dashboard_Client />} />
+                <Route path="folder/:folderId" element={<ClientFolderFiles />} />
               </Route>
             </Route>
           </Routes>

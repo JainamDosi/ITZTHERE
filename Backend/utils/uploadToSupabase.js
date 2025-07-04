@@ -6,17 +6,17 @@ export const uploadToSupabase = async (file) => {
   const bucket = process.env.SUPABASE_BUCKET;
   if (!file) throw new Error("No file provided");
 
-  // Generate a unique filename using timestamp and original name
-  const ext = path.extname(file.originalname); // e.g., ".pdf"
-  const base = path.basename(file.originalname, ext); // e.g., "aadhaar"
-  const uniqueName = `${Date.now()}-${base}${ext}`; // e.g., "1719462234-aadhaar.pdf"
+  // Generate a unique filename
+  const ext = path.extname(file.originalname);
+  const base = path.basename(file.originalname, ext);
+  const uniqueName = `${Date.now()}-${base}${ext}`;
 
-  // Upload to Supabase
+  // Upload to Supabase Storage
   const { data, error } = await supabase.storage
     .from(bucket)
     .upload(uniqueName, fs.createReadStream(file.path), {
       contentType: file.mimetype,
-      duplex: "half", // Required for streams in Node
+      duplex: "half",
     });
 
   // Delete temp file
@@ -24,6 +24,5 @@ export const uploadToSupabase = async (file) => {
 
   if (error) throw new Error(error.message);
 
-  const publicUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/${bucket}/${data.path}`;
-  return { path: data.path, publicUrl };
+  return { path: data.path }; // ✅ only return path
 };

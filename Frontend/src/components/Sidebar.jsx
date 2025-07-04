@@ -9,15 +9,17 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import EditProfileModal from "../components/EditProfileModal";
 
 const Sidebar = () => {
   const location = useLocation();
   const pathname = location.pathname;
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const queryClient = useQueryClient();
 
   const [showModal, setShowModal] = useState(false);
   const [newFolder, setNewFolder] = useState("");
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   const handleAddFolder = async () => {
     if (!newFolder.trim()) return;
@@ -57,8 +59,12 @@ const Sidebar = () => {
             <div className="hidden sm:block flex-1 min-w-0">
               <h2 className="font-bold text-base truncate">{user.name}</h2>
               <p className="text-sm text-gray-500 truncate">{user.email}</p>
+              <p className="text-xs text-gray-400 truncate">{user.role}</p>
             </div>
-            <FiEdit2 className="text-gray-500 cursor-pointer hidden sm:block" />
+            <FiEdit2
+              className="text-gray-500 cursor-pointer hidden sm:block"
+              onClick={() => setEditModalOpen(true)}
+            />
           </div>
 
           {/* Navigation */}
@@ -100,15 +106,20 @@ const Sidebar = () => {
               ) : companyDivisions.length === 0 ? (
                 <div className="text-sm text-gray-400 italic">No folders</div>
               ) : (
-                companyDivisions.map((folder) => (
-                  <Link
-                    to={`/main/folder/${folder._id}`}
-                    key={folder._id}
-                    className="flex items-center justify-between text-sm text-gray-700 cursor-pointer hover:text-pink-700 border-b transition px-1 py-1"
-                  >
-                    <span>{folder.name}</span>
-                  </Link>
-                ))
+                companyDivisions.map((folder) => {
+                  const isActive = pathname === `/main/folder/${folder._id}`;
+                  return (
+                    <Link
+                      to={`/main/folder/${folder._id}`}
+                      key={folder._id}
+                      className={`flex items-center justify-between text-sm cursor-pointer transition px-1 py-1 border-b rounded
+                        ${isActive ? "bg-pink-100 text-pink-700 font-semibold" : "text-gray-700 hover:text-pink-700"}
+                      `}
+                    >
+                      <span>{folder.name}</span>
+                    </Link>
+                  );
+                })
               )}
             </div>
           </div>
@@ -131,7 +142,7 @@ const Sidebar = () => {
 
       {/* Add Folder Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black bg-opacity-40 flex items-center justify-center">
           <div className="bg-white rounded-xl p-6 w-11/12 max-w-sm shadow-lg relative">
             <button
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
@@ -156,6 +167,14 @@ const Sidebar = () => {
           </div>
         </div>
       )}
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        user={user}
+        setUser={setUser}
+      />
     </>
   );
 };
@@ -165,7 +184,7 @@ const MenuItem = ({ icon, label, active }) => (
     className={`
       flex items-center sm:justify-start justify-center gap-0 sm:gap-3
       px-2 sm:px-4 py-2 rounded cursor-pointer text-sm font-medium w-full
-      ${active ? "text-pink-700" : "text-gray-700"}
+      ${active ? "text-pink-700 bg-pink-50" : "text-gray-700"}
       hover:bg-gray-100
       transition-all duration-300 ease-in-out
     `}

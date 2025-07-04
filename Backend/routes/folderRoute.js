@@ -153,33 +153,71 @@ router.get("/requestable", protect, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
+// GET files in a folder — with role-based access control
 router.get("/:folderId/files", protect, async (req, res) => {
   const { folderId } = req.params;
-  const user = req.user; // assuming you're using a middleware like passport/jwt to attach user
+  const { page = 1, limit = 100 } = req.query;
+  const skip = (parseInt(page) - 1) * parseInt(limit);
 
   try {
     const folder = await Folder.findById(folderId);
-    if (!folder) return res.status(404).json({ error: "Folder not found" });
+    if (!folder) {
+      return res.status(404).json({ error: "Folder not found" });
+    }
 
-    // 🔒 Check access based on role
-    if (user.role === "company-admin") {
-      if (String(folder.companyId) !== String(user.companyId)) {
+    const user = req.user;
+
+    const isCompanyAdmin =
+      user.role === "company-admin" &&
+      String(folder.companyId) === String(user.companyId);
+
+    const isEmployee =
+      user.role === "employee" &&
+      folder.allowedUsers.some((id) => String(id) === String(user._id));
+
+    const isClient = user.role === "client";
+
+    // 🔐 Strict check for client — deny if no assigned file in this folder
+    if (isClient) {
+      const hasAccess = await File.exists({
+        folder: folderId,
+        assignedClients: user._id,
+      });
+
+      if (!hasAccess) {
         return res.status(403).json({ error: "Access denied" });
       }
-    } else if (user.role === "employee") {
-      if (!folder.allowedUsers.includes(user._id)) {
-        return res.status(403).json({ error: "Access denied" });
-      }
-    } else {
+    }
+
+    // ❌ Block access if no valid role match
+    if (!isCompanyAdmin && !isEmployee && !isClient) {
       return res.status(403).json({ error: "Access denied" });
     }
 
-    const files = await File.find({ folder: folderId });
-    return res.json({ files });
+    // ✅ Build filtered file query
+    const fileFilter = { folder: folderId };
+    if (isClient) {
+      fileFilter.assignedClients = user._id;
+    }
+
+    const total = await File.countDocuments(fileFilter);
+
+    const files = await File.find(fileFilter)
+      .skip(skip)
+      .limit(parseInt(limit))
+      .populate("assignedClients", "name email") // ✅ So frontend sees client names
+      .select("_id name size type createdAt assignedClients"); // ✅ Must include assignedClients
+
+    res.json({
+      files,
+      total,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Server error" });
+    console.error("[FOLDER FILES ERROR]:", err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
