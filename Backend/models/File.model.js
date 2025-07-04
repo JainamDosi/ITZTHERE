@@ -9,6 +9,8 @@ const fileSchema = new mongoose.Schema({
   companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
   url: { type: String, required: true },
   assignedClients: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  pinnedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+
   createdAt: { type: Date, default: Date.now },
 });
 

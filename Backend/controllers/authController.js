@@ -74,14 +74,15 @@ export const verifyRegisterAndCreateUser = async (req, res) => {
           .status(400)
           .json({ error: "Missing company information or document" });
       }
+
       console.log("[UPLOAD] Uploading company doc...");
-      const { publicUrl } = await uploadToSupabase(companyDoc);
+      const { path: docPath } = await uploadToSupabase(companyDoc);
 
       console.log("[COMPANY] Creating company...");
       const company = await Company.create({
         name: companyName,
         gstin,
-        verificationDocs: [publicUrl],
+        verificationDocs: [docPath], // ✅ store path only
         storagePlan: plan,
       });
 
@@ -94,10 +95,10 @@ export const verifyRegisterAndCreateUser = async (req, res) => {
         phone,
         isVerified: true,
         plan,
-        companyId: company._id, // ✅ add it during creation
+        companyId: company._id, // ✅ link company to user
       });
 
-      // ✅ Set company.admin after user is created (optional)
+      // Optional: link user back to company as admin
       company.admin = user._id;
       await company.save();
     } else {
@@ -107,8 +108,7 @@ export const verifyRegisterAndCreateUser = async (req, res) => {
       }
 
       console.log("[UPLOAD] Uploading identity doc...");
-      const { publicUrl: docUrl } = await uploadToSupabase(identityDoc);
-      console.log(docUrl);
+      const { path: docPath } = await uploadToSupabase(identityDoc);
 
       console.log("[USER] Creating individual user...");
       user = await User.create({
@@ -116,12 +116,14 @@ export const verifyRegisterAndCreateUser = async (req, res) => {
         email,
         passwordHash,
         role: "Individual",
-        verificationDoc: docUrl,
+        verificationDoc: docPath, // ✅ store path only
         plan,
       });
     }
 
+    // Cleanup used OTPs
     await Otp.deleteMany({ email, purpose: "register" });
+
     console.log("[SUCCESS] User registered:", email);
     res.json({ data: user, message: "User registered successfully" });
   } catch (err) {

@@ -3,20 +3,18 @@ import React, { useEffect, useRef, useState } from "react";
 const OtpModal = ({ open, otp, setOtp, onCancel, onVerify, onResend }) => {
   const inputsRef = useRef([]);
   const [cooldown, setCooldown] = useState(30);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Auto-start countdown on open
   useEffect(() => {
-    if (open) setCooldown(30);
+    if (open) {
+      setCooldown(30);
+      setIsSubmitting(false); // reset on open
+    }
   }, [open]);
 
-  // Timer effect
   useEffect(() => {
     if (!open || cooldown <= 0) return;
-
-    const interval = setInterval(() => {
-      setCooldown((prev) => prev - 1);
-    }, 1000);
-
+    const interval = setInterval(() => setCooldown((prev) => prev - 1), 1000);
     return () => clearInterval(interval);
   }, [cooldown, open]);
 
@@ -48,6 +46,12 @@ const OtpModal = ({ open, otp, setOtp, onCancel, onVerify, onResend }) => {
     inputsRef.current[Math.min(pasted.length, 5)]?.focus();
   };
 
+  const handleVerify = () => {
+    setIsSubmitting(true);
+    Promise.resolve(onVerify()) // handles both sync and async
+      .finally(() => setIsSubmitting(false));
+  };
+
   if (!open) return null;
 
   return (
@@ -76,9 +80,10 @@ const OtpModal = ({ open, otp, setOtp, onCancel, onVerify, onResend }) => {
             <button
               onClick={() => {
                 onResend();
-                setCooldown(30); // reset cooldown
+                setCooldown(30);
               }}
               className="text-blue-600 hover:underline"
+              disabled={isSubmitting}
             >
               Resend OTP
             </button>
@@ -89,15 +94,16 @@ const OtpModal = ({ open, otp, setOtp, onCancel, onVerify, onResend }) => {
           <button
             onClick={onCancel}
             className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            disabled={isSubmitting}
           >
             Cancel
           </button>
           <button
-            onClick={onVerify}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            disabled={otp.length < 6}
+            onClick={handleVerify}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            disabled={otp.length < 6 || isSubmitting}
           >
-            Verify OTP
+            {isSubmitting ? "Verifying..." : "Verify OTP"}
           </button>
         </div>
       </div>

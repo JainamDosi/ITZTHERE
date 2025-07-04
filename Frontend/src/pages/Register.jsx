@@ -113,6 +113,7 @@ const Register = () => {
       formData.append('otp', otp);
       formData.append('userType', form.userType);
       formData.append('phone', form.phone || '');
+      formData.append('plan', form.plan);
 
       if (form.userType === 'company') {
         formData.append('companyName', form.companyName);

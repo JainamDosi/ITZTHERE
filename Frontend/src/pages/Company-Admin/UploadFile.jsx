@@ -3,12 +3,13 @@ import { FiUploadCloud } from "react-icons/fi";
 import { FaSortDown } from "react-icons/fa";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const UploadFile = () => {
   const [department, setDepartment] = useState("");
   const [files, setFiles] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
 
-  // ✅ Fetch allowed folders from backend using React Query
   const { data: folders = [], isLoading, isError } = useQuery({
     queryKey: ["allowedFolders"],
     queryFn: async () => {
@@ -30,10 +31,34 @@ const UploadFile = () => {
     setFiles((prev) => [...prev, ...selectedFiles]);
   };
 
-  const handleSubmit = () => {
-    console.log("Submitting files:", files);
-    console.log("Selected folder ID:", department);
-    // TODO: Implement actual upload logic here
+  const handleSubmit = async () => {
+    if (!department || files.length === 0) return;
+
+    const formData = new FormData();
+    formData.append("folderId", department);
+    files.forEach((file) => formData.append("files", file)); // must match multer field
+
+    try {
+      setIsUploading(true);
+      const res = await axios.post(
+        "http://localhost:3000/api/files/upload",
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      toast.success("Files uploaded successfully!");
+      setFiles([]);
+      setDepartment("");
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Upload failed");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -103,9 +128,9 @@ const UploadFile = () => {
         <button
           onClick={handleSubmit}
           className="bg-pink-700 text-white px-6 py-2 rounded shadow hover:bg-fuchsia-900 transition"
-          disabled={!department || files.length === 0}
+          disabled={!department || files.length === 0 || isUploading}
         >
-          Submit Files
+          {isUploading ? "Uploading..." : "Submit Files"}
         </button>
       </div>
     </div>
