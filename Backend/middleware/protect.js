@@ -11,7 +11,8 @@ export const protect = async (req, res, next) => {
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    req.user = user; // inject user into req
+    req.user = user;
+    // inject user into req
     next();
   } catch (err) {
     console.error("Auth error:", err);

@@ -218,33 +218,53 @@ const Register = () => {
               </label>
             </div>
 
-            {/* Plan Selection */}
-            <div>
-              <h3 className="text-center font-semibold mb-2">Choose Your Plan</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {[
-                  { id: 'individual', title: 'Individual', price: '₹199/mo', features: ['Basic Access'] },
-                  { id: 'business', title: 'Business', price: '₹499/mo', features: ['Team Access', 'Basic Analytics'] },
-                  { id: 'business-plus', title: 'Business+', price: '₹999/mo', features: ['All Features', 'Priority Support'] },
-                ].map((plan) => (
-                  <div
-                    key={plan.id}
-                    onClick={() => setForm({ ...form, plan: plan.id })}
-                    className={`cursor-pointer border rounded-lg p-4 shadow-sm transition-all duration-200 hover:shadow-md ${
-                      form.plan === plan.id ? 'border-pink-600 bg-pink-100' : 'border-gray-300'
-                    }`}
-                  >
-                    <h4 className="text-sm font-bold mb-1">{plan.title}</h4>
-                    <p className="text-xs mb-2 text-gray-600">{plan.price}</p>
-                    <ul className="text-xs text-gray-500 space-y-1">
-                      {plan.features.map((f, i) => (
-                        <li key={i}>• {f}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
+                    {/* Plan Selection */}
+                    <div>
+          <h3 className="text-center font-semibold mb-2">Choose Your Plan</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[
+              {
+                id: 'individual',
+                title: 'Individual',
+                price: '₹199/mo',
+                features: ['Basic Access'],
+                allowedUserTypes: ['individual'],
+              },
+              {
+                id: 'business',
+                title: 'Business',
+                price: '₹499/mo',
+                features: ['Team Access', 'Basic Analytics'],
+                allowedUserTypes: ['company'],
+              },
+              {
+                id: 'business-plus',
+                title: 'Business+',
+                price: '₹999/mo',
+                features: ['All Features', 'Priority Support'],
+                allowedUserTypes: ['company'],
+              },
+            ]
+              .filter((plan) => plan.allowedUserTypes.includes(form.userType))
+              .map((plan) => (
+                <div
+                  key={plan.id}
+                  onClick={() => setForm({ ...form, plan: plan.id })}
+                  className={`cursor-pointer border rounded-lg p-4 shadow-sm transition-all duration-200 hover:shadow-md ${
+                    form.plan === plan.id ? 'border-pink-600 bg-pink-100' : 'border-gray-300'
+                  }`}
+                >
+                  <h4 className="text-sm font-bold mb-1">{plan.title}</h4>
+                  <p className="text-xs mb-2 text-gray-600">{plan.price}</p>
+                  <ul className="text-xs text-gray-500 space-y-1">
+                    {plan.features.map((f, i) => (
+                      <li key={i}>• {f}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+          </div>
+        </div>
 
             {/* Company Fields */}
             {form.userType === 'company' && (
