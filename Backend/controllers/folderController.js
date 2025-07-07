@@ -1,4 +1,4 @@
-import Folder from "../models/Folder.js";
+import Folder from "../models/Folder.model.js";
 import AccessRequest from "../models/AccessRequest.js"; // for requestable folders
 import File from "../models/File.model.js"; // for fetching files in a folder
 
@@ -15,6 +15,8 @@ export const VisibleFolders = async (req, res) => {
         companyId,
         allowedUsers: userId,
       });
+    } else if (role === "Individual") {
+      folders = await Folder.find({ createdBy: userId });
     } else if (role === "client") {
       folders = []; // clients don’t see folder structure
     } else {
@@ -38,7 +40,8 @@ export const CreateFolder = async (req, res) => {
 
     const folder = new Folder({
       name,
-      companyId: req.user.companyId, // automatically injected from auth middleware
+      companyId: req.user.companyId,
+      createdBy: req.user._id, // automatically injected from auth middleware
     });
 
     await folder.save();
@@ -148,7 +151,6 @@ export const RequestableFolders = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 export const GetFilesInFolder = async (req, res) => {
   const { folderId } = req.params;
   const { page = 1, limit = 100 } = req.query;
@@ -172,6 +174,10 @@ export const GetFilesInFolder = async (req, res) => {
 
     const isClient = user.role === "client";
 
+    const isIndividual =
+      user.role === "Individual" &&
+      String(folder.createdBy) === String(user._id);
+
     // 🔐 Strict check for client — deny if no assigned file in this folder
     if (isClient) {
       const hasAccess = await File.exists({
@@ -185,7 +191,7 @@ export const GetFilesInFolder = async (req, res) => {
     }
 
     // ❌ Block access if no valid role match
-    if (!isCompanyAdmin && !isEmployee && !isClient) {
+    if (!isCompanyAdmin && !isEmployee && !isClient && !isIndividual) {
       return res.status(403).json({ error: "Access denied" });
     }
 
@@ -200,8 +206,8 @@ export const GetFilesInFolder = async (req, res) => {
     const files = await File.find(fileFilter)
       .skip(skip)
       .limit(parseInt(limit))
-      .populate("assignedClients", "name email") // ✅ So frontend sees client names
-      .select("_id name size type createdAt assignedClients"); // ✅ Must include assignedClients
+      .populate("assignedClients", "name email")
+      .select("_id name size type createdAt assignedClients");
 
     res.json({
       files,

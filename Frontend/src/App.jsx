@@ -22,6 +22,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import FolderFiles from './pages/Company-Admin/FolderFiles';
 import EmployeeFolderPage from './pages/Company-Employee/EmployeeFolderPage';
 import ClientFolderFiles from './pages/Client/ClientFolderFiles';
+import MainLayout_Individual from './pages/Individual/MainLayout';
+import Dashboard_Individual from './pages/Individual/Dashboard_Individual';
+import IndividualFolderPage from './pages/Individual/IndividualFolderFiles';
 
 const Windo_landing = lazy(() => import('./pages/Windo_landing'))
 const ITZTHERE_ = lazy(() => import('./pages/ITZTHERE'))
@@ -71,6 +74,17 @@ function App() {
                 <Route path="folder/:folderId" element={<ClientFolderFiles />} />
               </Route>
             </Route>
+      
+            {/* Individual Protected Routes */} 
+            <Route element={<ProtectedRoute allowedRoles={['Individual']} />}>
+                <Route path="/individual" element={<MainLayout_Individual />}>
+                <Route index element={<Dashboard_Individual />} />
+                <Route path="dashboard" element={<Dashboard_Individual />} />
+                <Route path="upload" element={<UploadFile />} />
+                <Route path="folder/:folderId" element={<IndividualFolderPage />} />
+            </Route>
+            </Route>
+
           </Routes>
         </Suspense>
       </BrowserRouter>

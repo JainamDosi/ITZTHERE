@@ -32,6 +32,7 @@ const Login = () => {
         if (role === 'company-admin') navigate('/main/dashboard', { replace: true });
         else if (role === 'employee') navigate('/employee/dashboard', { replace: true });
         else if (role === 'client') navigate('/client/dashboard', { replace: true });
+        else if(role=="Individual") navigate('/individual/dashboard', { replace: true });
         else navigate('/', { replace: true });
       }
     }

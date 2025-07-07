@@ -5,9 +5,13 @@ const folderSchema = new mongoose.Schema({
   companyId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Company",
-    required: true,
   },
   allowedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // employees only
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   createdAt: { type: Date, default: Date.now },
 });
 

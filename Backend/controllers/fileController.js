@@ -135,23 +135,24 @@ export const deleteFile = async (req, res) => {
 
     if (!file) return res.status(404).json({ error: "File not found" });
 
-    const isOwner = file.uploader.equals(user._id);
     const isCompanyAdmin =
       user.role === "company-admin" &&
       String(user.companyId) === String(file.companyId);
-    const isSuperAdmin = user.role === "super-admin";
 
-    if (!isOwner && !isCompanyAdmin && !isSuperAdmin) {
+    const isIndividual =
+      user.role === "Individual" && String(file.uploader) === String(user._id); // Individual owns the file
+
+    if (!isCompanyAdmin && !isIndividual) {
       return res.status(403).json({ error: "Unauthorized" });
     }
 
     // 🧹 Delete from Supabase
     await supabase.storage.from(process.env.SUPABASE_BUCKET).remove([file.url]);
 
-    // 🗑️ Delete from DB
+    // 🗑️ Delete from MongoDB
     await File.findByIdAndDelete(fileId);
 
-    res.json({ message: "File deleted" });
+    res.json({ message: "File deleted successfully" });
   } catch (err) {
     console.error("[DELETE FILE ERROR]:", err);
     res.status(500).json({ error: "Server error" });
@@ -283,21 +284,17 @@ export const UnpinFile = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 export const GetPinnedFiles = async (req, res) => {
   const user = req.user;
   const userId = req.user._id;
 
   try {
     if (user.role === "employee") {
-      // Step 1: Get folder IDs where this employee is allowed
-      const allowedFolders = await Folder.find({
-        allowedUsers: userId,
-      }).select("_id");
-
+      const allowedFolders = await Folder.find({ allowedUsers: userId }).select(
+        "_id"
+      );
       const allowedFolderIds = allowedFolders.map((folder) => folder._id);
 
-      // Step 2: Fetch pinned files only if in allowed folders
       const files = await File.find({
         pinnedBy: userId,
         folder: { $in: allowedFolderIds },
@@ -306,8 +303,22 @@ export const GetPinnedFiles = async (req, res) => {
         .sort({ createdAt: -1 });
 
       return res.json({ files });
+    } else if (user.role === "Individual") {
+      const ownedFolders = await Folder.find({ createdBy: userId }).select(
+        "_id"
+      );
+      const ownedFolderIds = ownedFolders.map((folder) => folder._id);
+
+      const files = await File.find({
+        pinnedBy: userId,
+        folder: { $in: ownedFolderIds },
+      })
+        .populate("folder", "name")
+        .sort({ createdAt: -1 });
+
+      return res.json({ files });
     } else {
-      // For clients or admins
+      // For clients and company-admins (optional: adjust this logic per role)
       const files = await File.find({
         pinnedBy: userId,
         assignedClients: userId,
