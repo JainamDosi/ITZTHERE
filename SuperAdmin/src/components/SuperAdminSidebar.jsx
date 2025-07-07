@@ -186,7 +186,7 @@ const SuperAdminSidebar = () => {
       route: "/superadmin/clients",
     },
     {
-      name: "Personal Users",
+      name: "Users",
       icon: (
         <img
           src={usersIcon}
@@ -194,7 +194,7 @@ const SuperAdminSidebar = () => {
           className="w-6 h-6 object-contain scale-125"
         />
       ),
-      route: "/superadmin/personals",
+      route: "/superadmin/users",
     },
     {
       name: "Manage Requests",
