@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom"; 
 import SuperAdminHeader from "../components/SuperAdminHeader";
 import SuperAdminSidebar from "../components/SuperAdminSidebar";
 import StatCard from "../components/SuperAdminStatcard";
@@ -20,7 +21,7 @@ const clientData = [
   },
   {
     name: "Client C",
-    affiliatedCompany: "Company A",
+    affiliatedCompany: "Company B",
     storageUsed: "0.49 GB",
     docsUploaded: 110,
   },
@@ -28,9 +29,15 @@ const clientData = [
 
 const ClientsPage = () => {
   const [search, setSearch] = useState("");
+  const location = useLocation(); 
 
-  const filteredClients = clientData.filter((client) =>
-    client.name.toLowerCase().includes(search.toLowerCase())
+  const companyName = location.state?.companyName; 
+
+  
+  const filteredClients = clientData.filter(
+    (client) =>
+      client.name.toLowerCase().includes(search.toLowerCase()) &&
+      (!companyName || client.affiliatedCompany === companyName)
   );
 
   return (
@@ -45,24 +52,6 @@ const ClientsPage = () => {
         </div>
 
         <div className="flex-1 h-full overflow-y-auto p-6 pt-2">
-          {/* Quick Stats */}
-          <section className="flex flex-wrap gap-12 mb-8">
-            
-            <StatCard
-              icon={<FaCloud />}
-              title="Total Storage Used By Clients"
-              progressBar={{
-                percent: (89 / 491) * 100,
-                label: "0.49 GB used of 4916GB",
-              }}
-            />
-            <StatCard
-              icon={<FaFileAlt />}
-              title="Total Docs Uploaded By Clients"
-              value="1253"
-            />
-          </section>
-
           {/* Search Bar */}
           <div className="flex items-center w-full max-w-lg bg-white border rounded shadow px-4 py-2 mb-4">
             <div className="flex items-center gap-2">
@@ -82,27 +71,31 @@ const ClientsPage = () => {
 
           {/* Client Cards */}
           <div className="space-y-4">
-            {filteredClients.map((client, idx) => (
-              <div key={idx} className="border border-gray-300 rounded-md p-4 shadow bg-white">
-                <h3 className="text-sm font-bold text-black mb-2">{client.name}</h3>
-                <div className="flex flex-wrap gap-4 text-sm text-black">
-                  <div className="flex items-center gap-2">
-                    <FaCloud className="text-lg" />
-                    <span>{client.storageUsed} used of 4916GB</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FaFileAlt className="text-lg" />
-                    <span>Documents Uploaded - {client.docsUploaded}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-600">Affiliated with {client.affiliatedCompany}</span>
+            {filteredClients.length > 0 ? (
+              filteredClients.map((client, idx) => (
+                <div key={idx} className="border border-gray-300 rounded-md p-4 shadow bg-white">
+                  <h3 className="text-sm font-bold text-black mb-2">{client.name}</h3>
+                  <div className="flex flex-wrap gap-4 text-sm text-black">
+                    <div className="flex items-center gap-2">
+                      <FaCloud className="text-lg" />
+                      <span>{client.storageUsed} used of 4916GB</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FaFileAlt className="text-lg" />
+                      <span>Documents Uploaded - {client.docsUploaded}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-600">
+                        Affiliated with {client.affiliatedCompany}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-gray-500">No clients found.</p>
+            )}
           </div>
-
-          
         </div>
       </div>
     </div>
