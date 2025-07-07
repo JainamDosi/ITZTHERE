@@ -10,14 +10,16 @@ const initialRequestData = [
     requestedFrom: "TechCorp Pvt Ltd",
     employeeName: "Riya Sharma",
     folderName: "Quarterly Reports",
+    gstNumber: "27AABCU9603R1ZV",
     status: null,
   },
   {
     id: 2,
-    organization: "Client",
+    organization: "Company",
     requestedFrom: "Alpha Ventures",
     employeeName: "Aman Verma",
     folderName: "HR Onboarding",
+    gstNumber: "09AACCA1234F1ZP",
     status: null,
   },
   {
@@ -26,6 +28,7 @@ const initialRequestData = [
     requestedFrom: "Kavita Raj",
     employeeName: "Kavita Raj",
     folderName: "Finance Docs",
+    mobileNumber: "9876543210",
     status: null,
   },
 ];
@@ -61,10 +64,9 @@ const ManageRequestsPage = () => {
               <table className="min-w-full text-sm text-left border-collapse">
                 <thead>
                   <tr className="bg-gray-300 text-gray-800">
-                    <th className="px-4 py-2 rounded-l-md">Requested By</th>
-                    <th className="px-4 py-2">Requested From</th>
-                    <th className="px-4 py-2">Requester's Name</th>
-                    <th className="px-4 py-2">Folder Requested</th>
+                    <th className="px-4 py-2 rounded-l-md">Organization Type</th>
+                    <th className="px-4 py-2">Name</th>
+                    <th className="px-4 py-2">GST/Mobile Number</th>
                     <th className="px-4 py-2 rounded-r-md">Action</th>
                   </tr>
                 </thead>
@@ -73,8 +75,11 @@ const ManageRequestsPage = () => {
                     <tr key={req.id} className="border-b hover:bg-gray-50">
                       <td className="px-4 py-3">{req.organization}</td>
                       <td className="px-4 py-3">{req.requestedFrom}</td>
-                      <td className="px-4 py-3">{req.employeeName}</td>
-                      <td className="px-4 py-3">{req.folderName}</td>
+                      <td className="px-4 py-3">
+                        {req.organization === "Personal User"
+                          ? req.mobileNumber
+                          : req.gstNumber}
+                      </td>
                       <td className="px-4 py-3">
                         {req.status === null ? (
                           <div className="flex gap-2">
@@ -111,7 +116,7 @@ const ManageRequestsPage = () => {
                   {requests.length === 0 && (
                     <tr>
                       <td
-                        colSpan="5"
+                        colSpan="4"
                         className="text-center py-6 text-gray-500"
                       >
                         No pending requests.

@@ -3,6 +3,7 @@ import StatCard from "./SuperAdminStatcard";
 import CompanyCard from "./CompanyCard";
 import { FaCloud, FaFileAlt } from "react-icons/fa";
 import { Search } from "lucide-react";
+import { useNavigate } from "react-router-dom"; 
 
 import companiesIcon from "../assets/icons/companies.png";
 import clientsIcon from "../assets/icons/clients.png";
@@ -11,6 +12,8 @@ import usersIcon from "../assets/icons/users.png";
 const SuperAdminCompactDashboard = () => {
   const [search, setSearch] = useState("");
   const [selectedPlan, setSelectedPlan] = useState("All");
+
+  const navigate = useNavigate(); 
 
   const companyData = [
     {
@@ -48,25 +51,15 @@ const SuperAdminCompactDashboard = () => {
     return matchesName && matchesPlan;
   });
 
+  const handleCompanyClick = (company) => {
+    navigate("/superadmin/clients", { state: { companyName: company.name } }); 
+  };
+
   return (
     <main className="flex flex-col w-full overflow-y-auto h-[calc(100vh-160px)] p-6 pt-2">
       {/* Top Cards Section */}
       <section className="flex flex-wrap gap-12 mb-8">
-        {/* <StatCard
-          icon={<img src={companiesIcon} alt="Companies" className="w-12 h-12" />}
-          title="Companies"
-          value=""
-        />
-        <StatCard
-          icon={<img src={clientsIcon} alt="Clients" className="w-12 h-12 scale-125" />}
-          title="Clients"
-          value=""
-        />
-        <StatCard
-          icon={<img src={usersIcon} alt="Users" className="w-12 h-12 scale-125" />}
-          title="Users"
-          value=""
-        /> */}
+        {/* Cards like Storage and Docs Uploaded */}
         <StatCard
           icon={<FaCloud />}
           title="Storage"
@@ -75,11 +68,7 @@ const SuperAdminCompactDashboard = () => {
             label: "0.49 GB used of 4916GB",
           }}
         />
-        <StatCard
-          icon={<FaFileAlt />}
-          title="Docs Uploaded"
-          value="1253"
-        />
+        <StatCard icon={<FaFileAlt />} title="Docs Uploaded" value="1253" />
       </section>
 
       {/* Search Bar and Filters */}
@@ -118,7 +107,11 @@ const SuperAdminCompactDashboard = () => {
       <div className="space-y-4">
         {filteredCompanies.length > 0 ? (
           filteredCompanies.map((company, idx) => (
-            <CompanyCard key={idx} {...company} />
+            <CompanyCard
+              key={idx}
+              {...company}
+              onClick={() => handleCompanyClick(company)} 
+            />
           ))
         ) : (
           <p className="text-gray-500">No companies found.</p>
