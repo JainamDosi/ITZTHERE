@@ -10,13 +10,29 @@ import StatCard from "../../components/StatCard";
 const Dashboard = () => {
   const [loadingFileId, setLoadingFileId] = useState(null);
 
-  const { data, isLoading, isError, refetch } = useQuery({
+  // Pinned files query
+  const { data: pinnedFiles, isLoading, isError, refetch } = useQuery({
     queryKey: ["pinnedFiles"],
     queryFn: async () => {
       const res = await axios.get("http://localhost:3000/api/files/pinned", {
         withCredentials: true,
       });
       return res.data.files;
+    },
+  });
+
+  // Storage stats query
+  const {
+    data: statsData,
+    isLoading: statsLoading,
+    isError: statsError,
+  } = useQuery({
+    queryKey: ["dashboardStats"],
+    queryFn: async () => {
+      const res = await axios.get("http://localhost:3000/api/auth/stats", {
+        withCredentials: true,
+      });
+      return res.data;
     },
   });
 
@@ -58,6 +74,13 @@ const Dashboard = () => {
     }
   };
 
+  // Compute storage display values
+  const usedStorageMB = statsData?.usedStorageMB || 0;
+  const totalStorageMB = statsData?.totalStorageMB || 1024;
+  const usedStorageGB = (usedStorageMB / 1024).toFixed(2);
+  const totalStorageGB = (totalStorageMB / 1024).toFixed(2);
+  const usedPercent = ((usedStorageMB / totalStorageMB) * 100).toFixed(2);
+
   return (
     <div className="flex flex-col gap-6 sm:flex-row sm:gap-8">
       {/* Left Section */}
@@ -70,11 +93,11 @@ const Dashboard = () => {
             <p className="text-gray-400 text-sm mt-2">Loading...</p>
           ) : isError ? (
             <p className="text-red-500 text-sm mt-2">Error loading pinned files</p>
-          ) : !data?.length ? (
+          ) : !pinnedFiles?.length ? (
             <p className="text-gray-500 text-sm mt-2">No pinned files yet.</p>
           ) : (
             <div className="space-y-3 mt-3">
-              {data.map((file) => (
+              {pinnedFiles.map((file) => (
                 <div
                   key={file._id}
                   className="flex justify-between items-center p-3 border rounded hover:bg-gray-50"
@@ -131,14 +154,20 @@ const Dashboard = () => {
       {/* Right Sidebar Widgets */}
       <div className="flex-1 w-full sm:w-72 space-y-4">
         {/* Storage Card */}
-        <StatCard
-          icon={<FaCloud />}
-          title="Storage"
-          progressBar={{
-            percent: (4253 / 4916) * 100,
-            label: "0.49 GB used of 4916GB",
-          }}
-        />
+        {statsLoading ? (
+          <p className="text-sm text-gray-400">Loading storage...</p>
+        ) : statsError ? (
+          <p className="text-sm text-red-500">Error fetching storage data</p>
+        ) : (
+          <StatCard
+            icon={<FaCloud />}
+            title="Storage"
+            progressBar={{
+              percent: usedPercent,
+              label: `${usedStorageGB} GB used of ${totalStorageGB} GB`,
+            }}
+          />
+        )}
 
         {/* Company Updates Card */}
         <button className="w-full bg-white rounded-xl shadow px-4 py-3 text-center font-medium text-sm text-gray-700 hover:bg-gray-100 transition">

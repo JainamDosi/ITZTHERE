@@ -1,6 +1,7 @@
 import User from "../models/User.model.js";
 import bcrypt from "bcryptjs";
 import { sendCredentialsEmail } from "../utils/sendCredentialsEmail.js";
+
 export const createUserByCompanyAdmin = async (req, res) => {
   try {
     const adminUser = req.user;

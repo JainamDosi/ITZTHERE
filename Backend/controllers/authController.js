@@ -4,8 +4,9 @@ import Otp from "../models/Otp.js";
 import Company from "../models/Company.model.js";
 import { sendOtpEmail } from "../utils/sendOtp.js";
 import otpGenerator from "otp-generator";
-import jwt from "jsonwebtoken";
 import { uploadToSupabase } from "../utils/uploadToSupabase.js";
+import jwt from "jsonwebtoken";
+import File from "../models/File.model.js";
 
 export const requestRegisterOtp = async (req, res) => {
   try {
@@ -197,5 +198,78 @@ export const verifyLoginOtp = async (req, res) => {
   } catch (err) {
     console.error("[ERROR] OTP verification failed:", err);
     res.status(500).json({ error: "OTP verification failed" });
+  }
+};
+
+export const Userinfo = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    console.log("Token from cookie:", token);
+    if (!token) return res.status(401).json({ error: "Not authenticated" });
+
+    const decoded = jwt.verify(token, "secret");
+    // You may want to move this logic to a controller or middleware
+    const { default: User } = await import("../models/User.model.js");
+    const user = await User.findById(decoded.id).select("-password");
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    res.json({ user });
+  } catch (err) {
+    console.error("Error in /me route:", err);
+    res.status(401).json({ error: "Invalid token" });
+  }
+};
+
+export const UpdateProfile = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (name) user.name = name;
+    if (email) user.email = email;
+
+    await user.save();
+
+    res.json({ user });
+  } catch (error) {
+    console.error("Update profile failed:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const TransferAdminOwnership = async (req, res) => {
+  try {
+    const currentAdmin = req.user;
+    const { newOwnerId } = req.body;
+
+    if (currentAdmin.role !== "company-admin") {
+      return res
+        .status(403)
+        .json({ message: "Only company admins can transfer ownership" });
+    }
+
+    const newOwner = await User.findById(newOwnerId);
+    if (
+      !newOwner ||
+      newOwner.role !== "employee" ||
+      newOwner.companyId.toString() !== currentAdmin.companyId.toString()
+    ) {
+      return res.status(400).json({ message: "Invalid employee selected" });
+    }
+
+    // Demote current admin to employee
+    currentAdmin.role = "employee";
+    await currentAdmin.save();
+
+    // Promote selected employee to admin
+    newOwner.role = "company-admin";
+    await newOwner.save();
+
+    res.json({ message: "Ownership transferred successfully" });
+  } catch (error) {
+    console.error("Ownership transfer failed:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
