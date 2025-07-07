@@ -243,3 +243,82 @@ export const UnassignFileFromClient = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+export const PinFile = async (req, res) => {
+  const { fileId } = req.params;
+  console.log("Pinning file:", fileId);
+  const userId = req.user._id;
+
+  try {
+    const file = await File.findById(fileId);
+    if (!file) return res.status(404).json({ message: "File not found" });
+
+    if (!file.pinnedBy.includes(userId)) {
+      file.pinnedBy.push(userId);
+      await file.save();
+    }
+
+    res.json({ message: "File pinned" });
+  } catch (err) {
+    console.log("[PIN FILE ERROR]:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const UnpinFile = async (req, res) => {
+  const { fileId } = req.params;
+  const userId = req.user._id;
+
+  try {
+    const file = await File.findById(fileId);
+    if (!file) return res.status(404).json({ message: "File not found" });
+
+    file.pinnedBy = file.pinnedBy.filter(
+      (id) => id.toString() !== userId.toString()
+    );
+    await file.save();
+
+    res.json({ message: "File unpinned" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const GetPinnedFiles = async (req, res) => {
+  const user = req.user;
+  const userId = req.user._id;
+
+  try {
+    if (user.role === "employee") {
+      // Step 1: Get folder IDs where this employee is allowed
+      const allowedFolders = await Folder.find({
+        allowedUsers: userId,
+      }).select("_id");
+
+      const allowedFolderIds = allowedFolders.map((folder) => folder._id);
+
+      // Step 2: Fetch pinned files only if in allowed folders
+      const files = await File.find({
+        pinnedBy: userId,
+        folder: { $in: allowedFolderIds },
+      })
+        .populate("folder", "name")
+        .sort({ createdAt: -1 });
+
+      return res.json({ files });
+    } else {
+      // For clients or admins
+      const files = await File.find({
+        pinnedBy: userId,
+        assignedClients: userId,
+      })
+        .populate("folder", "name")
+        .sort({ createdAt: -1 });
+
+      res.json({ files });
+    }
+  } catch (err) {
+    console.error("Error fetching pinned files:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
