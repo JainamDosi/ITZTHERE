@@ -52,7 +52,7 @@ const ClientsPage = () => {
               icon={<FaCloud />}
               title="Total Storage Used By Clients"
               progressBar={{
-                percent: (0.49 / 4916) * 100,
+                percent: (89 / 491) * 100,
                 label: "0.49 GB used of 4916GB",
               }}
             />

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom"; // ✅ Add this
 import StatCard from "./SuperAdminStatcard";
 import { FaCloud, FaServer, FaFileAlt } from "react-icons/fa";
 import companiesIcon from "../assets/icons/companies.png";
@@ -25,35 +26,33 @@ const SuperAdminDashboardCards = () => {
 
   return (
     <main className="flex flex-col w-full overflow-y-auto h-[calc(100vh-160px)] p-6 pt-2">
-      {/* Top 3 cards */}
+      {/* ✅ Top 3 cards with Links */}
       <section className="flex flex-wrap gap-12">
-        <StatCard
-          icon={
-            <img src={companiesIcon} alt="Companies" className="w-12 h-12 " />
-          }
-          title="Companies"
-          value=""
-          
-        />
-        <StatCard
-          icon={
-            <img
-              src={clientsIcon}
-              alt="Clients"
-              className="w-12 h-12 scale-125"
-            />
-          }
-          title="Clients"
-          value=""
-        />
-        <StatCard
-          icon={
-            <img src={usersIcon} alt="Users" className="w-12 h-12 scale-125" />
-          }
-          title="Users"
-          value=""
-        />
+        <Link to="/superadmin/companies" className="hover:scale-105 transition-transform">
+          <StatCard
+            icon={<img src={companiesIcon} alt="Companies" className="w-12 h-12" />}
+            title="Companies"
+            value=""
+          />
+        </Link>
+
+        <Link to="/superadmin/clients" className="hover:scale-105 transition-transform">
+          <StatCard
+            icon={<img src={clientsIcon} alt="Clients" className="w-12 h-12 scale-125" />}
+            title="Clients"
+            value=""
+          />
+        </Link>
+
+        <Link to="/superadmin/users" className="hover:scale-105 transition-transform">
+          <StatCard
+            icon={<img src={usersIcon} alt="Users" className="w-12 h-12 scale-125" />}
+            title="Users"
+            value=""
+          />
+        </Link>
       </section>
+
 
       {/* Section Wise Storage + Bottom 2 cards */}
       <section className="flex gap-12 mt-10">
