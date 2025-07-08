@@ -26,6 +26,12 @@ import MainLayout_Individual from './pages/Individual/MainLayout';
 import Dashboard_Individual from './pages/Individual/Dashboard_Individual';
 import IndividualFolderPage from './pages/Individual/IndividualFolderFiles';
 
+import SuperAdminDashboardPage from './pages/SuperAdmin/SuperAdminDashboardPage';
+import CompaniesPage from './pages/SuperAdmin/CompaniesPage';
+import ClientsPage from './pages/SuperAdmin/ClientsPage';
+import UsersPage from './pages/SuperAdmin/UsersPage';
+import ManageRequestsPage from './pages/SuperAdmin/ManageRequestsPage';
+
 const Windo_landing = lazy(() => import('./pages/Windo_landing'))
 const ITZTHERE_ = lazy(() => import('./pages/ITZTHERE'))
 
@@ -84,6 +90,15 @@ function App() {
                 <Route path="folder/:folderId" element={<IndividualFolderPage />} />
             </Route>
             </Route>
+
+            <Route element={<ProtectedRoute allowedRoles={['superadmin']} />}>
+                  <Route path="/superadmin/dashboard" element={<SuperAdminDashboardPage />} />
+                  <Route path="/superadmin/companies" element={<CompaniesPage />} />
+                  <Route path="/superadmin/clients" element={<ClientsPage />} />
+                  <Route path="/superadmin/users" element={<UsersPage />} />
+                  <Route path="/superadmin/requests" element={<ManageRequestsPage />} />
+            </Route>
+
 
           </Routes>
         </Suspense>
