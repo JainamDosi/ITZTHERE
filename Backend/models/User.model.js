@@ -33,6 +33,15 @@ const userSchema = new mongoose.Schema({
 
   verificationDoc: { type: String },
 
+  status: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending",
+    required: function () {
+      return this.role === "Individual";
+    },
+  },
+
   createdAt: { type: Date, default: Date.now },
 });
 

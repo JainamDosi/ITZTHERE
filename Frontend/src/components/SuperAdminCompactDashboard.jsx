@@ -1,77 +1,59 @@
 import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+
 import StatCard from "./SuperAdminStatcard";
 import CompanyCard from "./CompanyCard";
 import { FaCloud, FaFileAlt } from "react-icons/fa";
 import { Search } from "lucide-react";
-import { useNavigate } from "react-router-dom"; 
-
-import companiesIcon from "../assets/companies.png";
-import clientsIcon from "../assets/clients.png";
-import usersIcon from "../assets/users.png";
+import { useNavigate } from "react-router-dom";
 
 const SuperAdminCompactDashboard = () => {
   const [search, setSearch] = useState("");
   const [selectedPlan, setSelectedPlan] = useState("All");
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
-  const companyData = [
-    {
-      name: "Company A",
-      plan: "Business",
-      storageUsed: "0.49 GB",
-      docsUploaded: 110,
-      clients: 25,
-      employees: 5,
-      membershipDays: 30,
+  // ✅ Fetch companies from backend
+  const { data: companyData = [], isLoading, isError, error } = useQuery({
+    queryKey: ["companies"],
+    queryFn: async () => {
+      const res = await axios.get("http://localhost:3000/api/super-admin/companies", {
+        withCredentials: true,
+      });
+      console.log("Fetched companies:", res.data); // Log the fetched data
+      return res.data;
     },
-    {
-      name: "Company B",
-      plan: "Business Plus",
-      storageUsed: "0.49 GB",
-      docsUploaded: 110,
-      clients: 25,
-      employees: 5,
-      membershipDays: 30,
-    },
-    {
-      name: "Company C",
-      plan: "Business",
-      storageUsed: "0.49 GB",
-      docsUploaded: 110,
-      clients: 25,
-      employees: 5,
-      membershipDays: 30,
-    },
-  ];
+  });
 
+  // ✅ Filter companies based on search and plan
   const filteredCompanies = companyData.filter((company) => {
     const matchesName = company.name.toLowerCase().includes(search.toLowerCase());
-    const matchesPlan = selectedPlan === "All" || company.plan === selectedPlan;
+    const matchesPlan = selectedPlan === "All" || company.storagePlan === selectedPlan;
     return matchesName && matchesPlan;
   });
 
+  // ✅ Handle company card click
   const handleCompanyClick = (company) => {
-    navigate("/superadmin/clients", { state: { companyName: company.name } }); 
+    navigate("/superadmin/clients", { state: { companyName: company.name } });
   };
 
   return (
     <main className="flex flex-col w-full overflow-y-auto h-[calc(100vh-160px)] p-6 pt-2">
-      {/* Top Cards Section */}
+      {/* Top Stat Cards */}
       <section className="flex flex-wrap gap-12 mb-8">
-        {/* Cards like Storage and Docs Uploaded */}
         <StatCard
           icon={<FaCloud />}
           title="Storage"
           progressBar={{
             percent: (4253 / 4916) * 100,
-            label: "0.49 GB used of 4916GB",
+            label: "0.49 GB used of 1GB",
           }}
         />
         <StatCard icon={<FaFileAlt />} title="Docs Uploaded" value="1253" />
       </section>
 
-      {/* Search Bar and Filters */}
+      {/* Search and Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div className="flex items-center w-full max-w-lg bg-white border rounded shadow px-4 py-2">
           <div className="flex items-center gap-2">
@@ -97,20 +79,24 @@ const SuperAdminCompactDashboard = () => {
             onChange={(e) => setSelectedPlan(e.target.value)}
           >
             <option value="All">All</option>
-            <option value="Business">Business</option>
-            <option value="Business Plus">Business Plus</option>
+            <option value="business">Business</option>
+            <option value="business-plus">Business Plus</option>
           </select>
         </div>
       </div>
 
       {/* Company Cards */}
       <div className="space-y-4">
-        {filteredCompanies.length > 0 ? (
-          filteredCompanies.map((company, idx) => (
+        {isLoading ? (
+          <p className="text-gray-500">Loading companies...</p>
+        ) : isError ? (
+          <p className="text-red-500">Error: {error.message}</p>
+        ) : filteredCompanies.length > 0 ? (
+          filteredCompanies.map((company) => (
             <CompanyCard
-              key={idx}
+              key={company.id || company.name} // Use unique key
               {...company}
-              onClick={() => handleCompanyClick(company)} 
+              onClick={() => handleCompanyClick(company)}
             />
           ))
         ) : (
