@@ -3,13 +3,14 @@ import { FaCloud, FaFileAlt, FaUsers, FaBriefcase } from "react-icons/fa";
 
 const CompanyCard = ({
   name,
-  plan,
+  storagePlan,
   storageUsed,
   docsUploaded,
-  clients,
-  employees,
+  clientCount,
+  employeeCount,
   membershipDays,
-  onClick, 
+  onClick, admin
+
 }) => {
   return (
     <div
@@ -17,12 +18,12 @@ const CompanyCard = ({
       className="border border-black rounded-md p-4 space-y-2 bg-white shadow-sm cursor-pointer hover:bg-gray-100 transition"
     >
       <div className="font-semibold text-base">
-        {name} - {plan}
+        {name} - {storagePlan}
       </div>
       <div className="flex flex-wrap gap-4 text-sm text-gray-800">
         <div className="flex items-center gap-2">
           <FaCloud />
-          <span>{storageUsed} used of 4916GB</span>
+          <span>{storageUsed} used of 1GB</span>
         </div>
         <div className="flex items-center gap-2">
           <FaFileAlt />
@@ -30,14 +31,17 @@ const CompanyCard = ({
         </div>
         <div className="flex items-center gap-2">
           <FaUsers />
-          <span>{clients} Clients</span>
+          <span>{clientCount} Clients</span>
         </div>
         <div className="flex items-center gap-2">
           <FaBriefcase />
-          <span>{employees} Employees</span>
+          <span>{employeeCount} Employees</span>
         </div>
         <div className="flex items-center gap-2">
           <span>🕒 {membershipDays} days of membership left</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span>Admin:- {admin}</span>
         </div>
       </div>
     </div>

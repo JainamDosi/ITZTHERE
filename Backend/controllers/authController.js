@@ -83,7 +83,7 @@ export const verifyRegisterAndCreateUser = async (req, res) => {
       const company = await Company.create({
         name: companyName,
         gstin,
-        verificationDocs: [docPath], // ✅ store path only
+        verificationDocs: [docPath],
         storagePlan: plan,
       });
 
@@ -136,30 +136,64 @@ export const verifyRegisterAndCreateUser = async (req, res) => {
 export const loginPassword = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: "Invalid credentials" });
+
+    // Find user and populate company if applicable
+    const user = await User.findOne({ email }).populate("companyId"); // <-- Make sure the field is "companyId"
+
+    if (!user) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
 
     const valid = await bcrypt.compare(password, user.passwordHash);
-    if (!valid) return res.status(400).json({ error: "Invalid credentials" });
+    if (!valid) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
 
+    // ✅ Status-based checks before sending OTP
+    if (user.role === "Individual") {
+      if (user.status === "pending") {
+        return res
+          .status(403)
+          .json({ error: "Your request is pending approval." });
+      } else if (user.status === "rejected") {
+        return res
+          .status(403)
+          .json({ error: "Your request has been rejected." });
+      }
+    } else if (user.role !== "super-admin") {
+      const companyStatus = user.companyId?.status;
+      if (companyStatus === "pending") {
+        return res
+          .status(403)
+          .json({ error: "Your company is pending approval." });
+      } else if (companyStatus === "rejected") {
+        return res
+          .status(403)
+          .json({ error: "Your company has been rejected." });
+      }
+    }
+
+    // ✅ Generate and store OTP
     const otp = otpGenerator.generate(6, {
       digits: true,
       lowerCaseAlphabets: false,
       upperCaseAlphabets: false,
       specialChars: false,
     });
+
     await Otp.findOneAndUpdate(
       { email, purpose: "login" },
       {
         email,
         otp,
         purpose: "login",
-        expiresAt: Date.now() + 5 * 60 * 1000,
+        expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes expiry
       },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
 
     await sendOtpEmail(email, otp, "login");
+
     res.json({ message: "OTP sent to email for 2FA" });
   } catch (err) {
     console.error("[ERROR] Login failed:", err);
@@ -210,7 +244,7 @@ export const Userinfo = async (req, res) => {
     const decoded = jwt.verify(token, "secret");
     // You may want to move this logic to a controller or middleware
     const { default: User } = await import("../models/User.model.js");
-    const user = await User.findById(decoded.id).select("-password");
+    const user = await User.findById(decoded.id).select("-passwordHash");
     if (!user) return res.status(404).json({ error: "User not found" });
 
     res.json({ user });

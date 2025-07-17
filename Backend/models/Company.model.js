@@ -17,7 +17,6 @@ const companySchema = new mongoose.Schema({
   gstin: { type: String, required: true }, // GST number for Indian companies
   createdAt: { type: Date, default: Date.now },
 });
-
 const Company = mongoose.model("Company", companySchema);
 
 export default Company;
