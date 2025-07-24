@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { FaUserPlus } from "react-icons/fa";
 import { IoIosArrowDown } from "react-icons/io";
+import { useAuth } from "../../context/AuthContext";
 
 function UserManagement() {
   const [selectedTab, setSelectedTab] = useState("Clients");
@@ -11,13 +12,14 @@ function UserManagement() {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [dropdownOpenIndex, setDropdownOpenIndex] = useState(null);
   const [folderStates, setFolderStates] = useState({});
+  const {user} = useAuth();
 
   const queryClient = useQueryClient();
 
   const { data: users = [], isLoading, isError } = useQuery({
     queryKey: ["companyUsers"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/create-user/myusers", {
+      const res = await axios.get("/create-user/myusers", {
         withCredentials: true,
       });
       return res.data.users;
@@ -27,15 +29,25 @@ function UserManagement() {
   const { data: allFolders = [] } = useQuery({
     queryKey: ["allFolders"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/folders/visible", {
+      const res = await axios.get("/folders/visible", {
         withCredentials: true,
       });
       return res.data.folders;
     },
   });
 
-  const clients = users.filter((u) => u.role === "client");
-  const employees = users.filter((u) => u.role === "employee");
+  const clients = users.filter(
+  (u) =>
+    u.allowedRoles.includes("client") &&
+    u.affiliatedWith?.includes(user.companyId)
+);
+
+  const employees = users.filter(
+    (u) =>
+      u.allowedRoles.includes("employee") &&
+      u.companyId === user.companyId
+  );
+
 
   // ✅ Initialize folderStates when users and folders are fetched
   useEffect(() => {
@@ -53,11 +65,11 @@ function UserManagement() {
 
     setFolderStates(initialState);
   }, [users, allFolders]);
-  console.log("Folder States:", folderStates);
+
 
   const createUserMutation = useMutation({
     mutationFn: (payload) =>
-      axios.post("http://localhost:3000/api/create-user", payload, {
+      axios.post("/create-user", payload, {
         withCredentials: true,
       }),
     onSuccess: () => {
@@ -72,7 +84,7 @@ function UserManagement() {
   const updatePermissionMutation = useMutation({
     mutationFn: async ({ folderId, allowedUserIds }) => {
       await axios.put(
-        `http://localhost:3000/api/folders/${folderId}/permissions`,
+        `/folders/${folderId}/permissions`,
         { allowedUserIds },
         { withCredentials: true }
       );

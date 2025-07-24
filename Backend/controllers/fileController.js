@@ -88,10 +88,23 @@ export const getCompanyClients = async (req, res) => {
       return res.status(403).json({ error: "Access denied" });
     }
 
-    const clients = await User.find({
-      companyId: user.companyId,
-      role: "client",
-    }).select("_id name email");
+    let query;
+
+    if (user.role === "company-admin") {
+      // Fetch clients affiliated with this company
+      query = {
+        allowedRoles: "client",
+        affiliatedWith: user.companyId,
+      };
+    } else if (user.role === "employee") {
+      // Employees can only view clients of their own company
+      query = {
+        allowedRoles: "client",
+        affiliatedWith: user.companyId,
+      };
+    }
+
+    const clients = await User.find(query).select("_id name email");
 
     res.json({ clients });
   } catch (err) {
@@ -284,6 +297,7 @@ export const UnpinFile = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 export const GetPinnedFiles = async (req, res) => {
   const user = req.user;
   const userId = req.user._id;
@@ -303,7 +317,7 @@ export const GetPinnedFiles = async (req, res) => {
         .sort({ createdAt: -1 });
 
       return res.json({ files });
-    } else if (user.role === "Individual") {
+    } else if (user.role === "individual") {
       const ownedFolders = await Folder.find({ createdBy: userId }).select(
         "_id"
       );

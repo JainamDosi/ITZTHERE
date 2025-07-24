@@ -17,32 +17,34 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [otpModalOpen, setOtpModalOpen] = useState(false);
-
-  // Get the intended path from location.state
+  const [roleModalOpen, setRoleModalOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('');
+  const [tempUser, setTempUser] = useState(null);
+  const API_BASE_URL = import.meta.env.REACT_APP_API_BASE_URL;
   const from = location.state?.from?.pathname || null;
 
-  // 🔁 Redirect if already logged in
   useEffect(() => {
     if (user && location.pathname === "/login") {
       if (from) {
         navigate(from, { replace: true });
       } else {
-        // fallback to dashboard by role
-        const role = user.role;
-        if (role === 'company-admin') navigate('/main/dashboard', { replace: true });
-        else if (role === 'employee') navigate('/employee/dashboard', { replace: true });
-        else if (role === 'client') navigate('/client/dashboard', { replace: true });
-        else if(role=="Individual") navigate('/individual/dashboard', { replace: true });
-        else if(role=="superadmin") navigate('/superadmin/dashboard', { replace: true });
-        else navigate('/', { replace: true });
+        redirectByRole(user.role);
       }
     }
-  }, [user, location.pathname, navigate, from]);
+  }, [user]);
 
-  // 🔐 Send OTP mutation
+  const redirectByRole = (role) => {
+    if (role === 'company-admin') navigate('/main/dashboard', { replace: true });
+    else if (role === 'employee') navigate('/employee/dashboard', { replace: true });
+    else if (role === 'client') navigate('/client/dashboard', { replace: true });
+    else if (role === 'individual') navigate('/individual/dashboard', { replace: true });
+    else if (role === 'super-admin') navigate('/superadmin/dashboard', { replace: true });
+    else navigate('/', { replace: true });
+  };
+
   const loginMutation = useMutation({
     mutationFn: async ({ email, password }) => {
-      return await axios.post('http://localhost:3000/api/auth/login/password', { email, password });
+      return await axios.post('/auth/login/password', { email, password });
     },
     onSuccess: (_, variables) => {
       toast.success('OTP sent to your email');
@@ -54,28 +56,49 @@ const Login = () => {
     },
   });
 
-  // ✅ OTP Verification mutation
   const verifyOtpMutation = useMutation({
     mutationFn: async ({ email, otp }) => {
-      return await axios.post("http://localhost:3000/api/auth/login/verify", { email, otp });
+      return await axios.post("/auth/login/verify", { email, otp });
     },
     onSuccess: (res) => {
       toast.success('Login successful!');
       setOtpModalOpen(false);
-      login(res.data.user); // Set context
 
-      const role = res.data.user.role;
-      if (role === 'company-admin') navigate('/main/dashboard', { replace: true });
-      else if (role === 'employee') navigate('/employee/dashboard', { replace: true });
-      else if (role === 'client') navigate('/client/dashboard', { replace: true });
-      else if(role=="Individual") navigate('/individual/dashboard', { replace: true });
-      else if(role=="superadmin") navigate('/superadmin/dashboard', { replace: true });
-      else navigate('/', { replace: true });
+      const loggedInUser = res.data.user;
+      
+      if (loggedInUser.allowedRoles && loggedInUser.allowedRoles.length > 1) {
+        setTempUser(loggedInUser);
+        setRoleModalOpen(true);
+      } else {
+        login(loggedInUser);
+        redirectByRole(loggedInUser.role);
+      }
     },
+
     onError: (err) => {
       toast.error(err.response?.data?.error || 'Invalid OTP');
     },
   });
+
+  const handleRoleConfirm = async () => {
+    if (!selectedRole) {
+      toast.error("Please select a role");
+      return;
+    }
+
+    try {
+      const res = await axios.patch(`/auth/set-role`, {
+        userId: tempUser.id,
+        role: selectedRole,
+      });
+      const updatedUser = { ...tempUser, role: selectedRole };
+      login(updatedUser);
+      setRoleModalOpen(false);
+      redirectByRole(selectedRole);
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to set role');
+    }
+  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -158,6 +181,37 @@ const Login = () => {
         onResend={handleResendOtp}
         loading={verifyOtpMutation.isPending}
       />
+
+      {/* Role Selection Modal */}
+      {roleModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
+            <h2 className="text-lg font-semibold mb-4">Select Your Role</h2>
+            <div className="space-y-3">
+              {tempUser?.allowedRoles?.map((role) => (
+                <label key={role} className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="role"
+                    value={role}
+                    checked={selectedRole === role}
+                    onChange={(e) => setSelectedRole(e.target.value)}
+                    className="accent-pink-600"
+                  />
+                  <span className="capitalize">{role}</span>
+                </label>
+              ))}
+            </div>
+            <button
+              onClick={handleRoleConfirm}
+              className="mt-4 w-full bg-pink-600 text-white py-2 rounded-md hover:bg-pink-700 transition"
+              disabled={!selectedRole}
+            >
+              Confirm Role
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

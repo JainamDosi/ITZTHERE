@@ -8,7 +8,7 @@ const ManageRequests = () => {
   const { data: requests = [], isLoading, refetch } = useQuery({
     queryKey: ["accessRequests"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/access-requests/all", {
+      const res = await axios.get("/access-requests/all", {
         withCredentials: true,
       });
       return res.data.requests;
@@ -17,7 +17,7 @@ const ManageRequests = () => {
 
   const handleAction = async (id, action) => {
     try {
-      await axios.patch(`http://localhost:3000/api/access-requests/${id}`, { action }, {
+      await axios.patch(`/access-requests/${id}`, { action }, {
         withCredentials: true,
       });
       toast.success(`Request ${action}d`);

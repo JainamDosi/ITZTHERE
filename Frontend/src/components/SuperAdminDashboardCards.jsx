@@ -11,15 +11,32 @@ import usersIcon from "../assets/users.png";
 import { PieChart } from "react-minimal-pie-chart";
 
 const fetchEnrollments = async () => {
-  const res = await axios.get("http://localhost:3000/api/super-admin/enrollments");
+  const res = await axios.get("/super-admin/enrollments");
+ 
   return res.data;
 };
+
+const fetchStorageStats = async () => {
+  const res = await axios.get("/super-admin/storage");
+
+  return res.data;
+};
+
+
+
 
 const SuperAdminDashboardCards = () => {
   const { data: enrollments, isLoading, isError, error } = useQuery({
     queryKey: ["enrollments"],
     queryFn: fetchEnrollments,
+    });
+
+    const { data: storageStats, isLoading: loadingStorage } = useQuery({
+    queryKey: ["storage-stats"],
+    queryFn: fetchStorageStats,
   });
+
+
 
   const total = enrollments
     ? enrollments.companies + enrollments.clients + enrollments.individuals + enrollments.users
@@ -139,19 +156,23 @@ const SuperAdminDashboardCards = () => {
 
         {/* Bottom two cards */}
         <div className="flex flex-col gap-8 ml-auto mr-5">
-          <StatCard
+                    <StatCard
             icon={<FaCloud />}
             title="Storage"
             progressBar={{
-              percent: (4253 / 4916) * 100,
-              label: "0.49 GB used of 1GB",
+              percent: storageStats ? (storageStats.totalSize / (1 * 1024 * 1024 * 1024)) * 100 : 0,
+              label: storageStats
+                ? `${(storageStats.totalSize / (1024 * 1024)).toFixed(2)} MB used of 1 GB`
+                : "Loading...",
             }}
           />
+
           <StatCard
             icon={<FaFileAlt />}
             title="Docs Uploaded"
-            value={enrollments.docsUploaded}
+            value={storageStats?.totalFiles ?? "00"}
           />
+
         </div>
       </section>
     </main>

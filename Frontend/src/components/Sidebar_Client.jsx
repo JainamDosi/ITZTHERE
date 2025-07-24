@@ -14,7 +14,7 @@ const Sidebar_Client = ({ user, setUser }) => {
   const { data: shared = [], isLoading } = useQuery({
     queryKey: ["sharedWithMe"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/files/shared-with-me", {
+      const res = await axios.get("/files/shared-with-me", {
         withCredentials: true,
       });
       return res.data.shared;

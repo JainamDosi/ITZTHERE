@@ -14,7 +14,7 @@ const Dashboard = () => {
   const { data: pinnedFiles, isLoading, isError, refetch } = useQuery({
     queryKey: ["pinnedFiles"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/files/pinned", {
+      const res = await axios.get("/files/pinned", {
         withCredentials: true,
       });
       return res.data.files;
@@ -29,7 +29,7 @@ const Dashboard = () => {
   } = useQuery({
     queryKey: ["dashboardStats"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/auth/stats", {
+      const res = await axios.get("/auth/stats", {
         withCredentials: true,
       });
       return res.data;
@@ -41,7 +41,7 @@ const Dashboard = () => {
       setLoadingFileId(fileId);
       try {
         const res = await axios.get(
-          `http://localhost:3000/api/files/signed-url/${fileId}?mode=${mode}`,
+          `/files/signed-url/${fileId}?mode=${mode}`,
           { withCredentials: true }
         );
         const url = res.data.signedUrl;
@@ -64,7 +64,7 @@ const Dashboard = () => {
 
   const handleUnpin = async (fileId) => {
     try {
-      await axios.delete(`http://localhost:3000/api/files/${fileId}/unpin`, {
+      await axios.delete(`/files/${fileId}/unpin`, {
         withCredentials: true,
       });
       toast.success("Unpinned file");

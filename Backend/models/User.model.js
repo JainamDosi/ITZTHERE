@@ -8,15 +8,19 @@ const userSchema = new mongoose.Schema({
       return (
         this.role !== "super-admin" &&
         this.role !== "client" &&
-        this.role !== "Individual"
+        this.role !== "individual"
       );
     },
   }, // required only for admins and employees
 
   role: {
     type: String,
-    enum: ["super-admin", "company-admin", "employee", "client", "Individual"],
+    enum: ["super-admin", "company-admin", "employee", "client", "individual"],
     required: true,
+  },
+  allowedRoles: {
+    type: [String],
+    default: [],
   },
 
   name: { type: String, required: true },
@@ -38,8 +42,14 @@ const userSchema = new mongoose.Schema({
     enum: ["pending", "approved", "rejected"],
     default: "pending",
     required: function () {
-      return this.role === "Individual";
+      return this.role === "individual";
     },
+  },
+  approvedAt: { type: Date },
+  billingCycle: {
+    type: String,
+    enum: ["monthly", "yearly"],
+    default: "monthly",
   },
 
   createdAt: { type: Date, default: Date.now },

@@ -18,7 +18,7 @@ const EditProfileModal = ({ isOpen, onClose, user, setUser }) => {
   const handleProfileUpdate = async () => {
     try {
       const res = await axios.patch(
-        "http://localhost:3000/api/auth/update-profile",
+        "/auth/update-profile",
         { name: editedName, email: editedEmail },
         { withCredentials: true }
       );
@@ -34,7 +34,7 @@ const EditProfileModal = ({ isOpen, onClose, user, setUser }) => {
     if (!selectedEmployeeId) return;
     try {
       await axios.post(
-        "http://localhost:3000/api/auth/transfer-ownership",
+        "/auth/transfer-ownership",
         { newOwnerId: selectedEmployeeId },
         { withCredentials: true }
       );
@@ -49,7 +49,7 @@ const EditProfileModal = ({ isOpen, onClose, user, setUser }) => {
   const { data: employees = [] } = useQuery({
     queryKey: ["companyUsers"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/create-user/myusers", {
+      const res = await axios.get("/create-user/myusers", {
         withCredentials: true,
       });
       return res.data.users.filter((u) => u.role === "employee");

@@ -24,7 +24,7 @@ const ClientFolderFiles = () => {
     queryKey: ["clientFolderFiles", folderId, page],
     queryFn: async () => {
       const res = await axios.get(
-        `http://localhost:3000/api/folders/${folderId}/files?page=${page}&limit=${limit}`,
+        `/folders/${folderId}/files?page=${page}&limit=${limit}`,
         { withCredentials: true }
       );
       return res.data;
@@ -40,7 +40,7 @@ const ClientFolderFiles = () => {
   } = useQuery({
     queryKey: ["pinnedFiles"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/files/pinned", {
+      const res = await axios.get("/files/pinned", {
         withCredentials: true,
       });
       return res.data.files; // array of pinned files
@@ -64,7 +64,7 @@ const ClientFolderFiles = () => {
       setLoadingFileId(fileId);
       try {
         const res = await axios.get(
-          `http://localhost:3000/api/files/signed-url/${fileId}?mode=${mode}`,
+          `/files/signed-url/${fileId}?mode=${mode}`,
           { withCredentials: true }
         );
         const url = res.data.signedUrl;
@@ -97,7 +97,7 @@ const ClientFolderFiles = () => {
   const throttledPinFile = useCallback(
     throttle(async (fileId) => {
       try {
-        await axios.post(`http://localhost:3000/api/files/${fileId}/pin`, null, {
+        await axios.post(`/files/${fileId}/pin`, null, {
           withCredentials: true,
         });
         toast.success("File pinned");
@@ -111,7 +111,7 @@ const ClientFolderFiles = () => {
   const throttledUnpinFile = useCallback(
     throttle(async (fileId) => {
       try {
-        await axios.delete(`http://localhost:3000/api/files/${fileId}/unpin`, {
+        await axios.delete(`/files/${fileId}/unpin`, {
           withCredentials: true,
         });
         toast.success("File unpinned");

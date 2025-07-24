@@ -21,7 +21,7 @@ const Sidebar_Individual = () => {
   const { data: companyFolders = [], isLoading, isError } = useQuery({
     queryKey: ["visibleFolders"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/folders/visible", {
+      const res = await axios.get("/folders/visible", {
         withCredentials: true,
       });
       return res.data.folders;
@@ -34,7 +34,7 @@ const Sidebar_Individual = () => {
     if (!newFolder.trim()) return;
     try {
       await axios.post(
-        "http://localhost:3000/api/folders/create",
+        "/folders/create",
         { name: newFolder },
         { withCredentials: true }
       );

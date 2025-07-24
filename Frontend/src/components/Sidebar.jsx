@@ -21,12 +21,23 @@ const Sidebar = () => {
   const [newFolder, setNewFolder] = useState("");
   const [editModalOpen, setEditModalOpen] = useState(false);
 
+  const { data: membership = {}, isLoading: isMembershipLoading } = useQuery({
+  queryKey: ["membership-summary"],
+  queryFn: async () => {
+    const res = await axios.get("/auth/plan-expiry", {
+      withCredentials: true,
+    });
+    return res.data;
+    },
+  });
+
+
   const handleAddFolder = async () => {
     if (!newFolder.trim()) return;
 
     try {
       await axios.post(
-        "http://localhost:3000/api/folders/create",
+        "/folders/create",
         { name: newFolder },
         { withCredentials: true }
       );
@@ -42,7 +53,7 @@ const Sidebar = () => {
   const { data: companyDivisions = [], isLoading, isError } = useQuery({
     queryKey: ["visibleFolders"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/folders/visible", {
+      const res = await axios.get("/folders/visible", {
         withCredentials: true,
       });
       return res.data.folders;
@@ -127,12 +138,22 @@ const Sidebar = () => {
 
         {/* Footer */}
         <div className="space-y-3 flex flex-col items-center sm:items-start w-full mt-4">
-          <div className="bg-white rounded-md shadow p-2 text-xs sm:text-sm flex items-center gap-2 text-gray-600 justify-center sm:justify-start w-full">
+                    <div className="bg-white rounded-md shadow p-2 text-xs sm:text-sm flex items-center gap-2 text-gray-600 justify-center sm:justify-start w-full">
             <FaCalendar />
             <span className="hidden sm:inline">
-              Plan expires in <span className="text-pink-700 font-semibold">320 days</span>
+              {isMembershipLoading ? (
+                "Checking plan..."
+              ) : (
+                <>
+                  Plan expires in{" "}
+                  <span className="text-pink-700 font-semibold">
+                    {membership.membershipDays || "Unknown"} days
+                  </span>
+                </>
+              )}
             </span>
           </div>
+
           <button className="w-full bg-pink-700 text-white font-semibold py-2 rounded-md shadow hover:bg-pink-800 transition text-xs sm:text-sm">
             <span className="hidden sm:inline">Upgrade now</span>
             <span className="sm:hidden">↑</span>

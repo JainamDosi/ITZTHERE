@@ -15,7 +15,11 @@ export const requestRegisterOtp = async (req, res) => {
 
     const existing = await User.findOne({ email });
     if (existing)
-      return res.status(400).json({ error: "Email already exists" });
+      return res.status(400).json({
+        error: "Email already exists",
+        allowedRole: existing.allowedRoles,
+        Id: existing._id, // only this
+      });
 
     const otp = otpGenerator.generate(6, {
       digits: true,
@@ -56,6 +60,7 @@ export const verifyRegisterAndCreateUser = async (req, res) => {
       gstin,
       phone,
       plan,
+      billingCycle, // ✅ added here
     } = req.body;
 
     console.log("[VERIFY] Verifying OTP for:", email);
@@ -70,10 +75,10 @@ export const verifyRegisterAndCreateUser = async (req, res) => {
 
     if (userType === "company") {
       const companyDoc = req.files?.companyDoc?.[0];
-      if (!companyName || !gstin || !companyDoc) {
-        return res
-          .status(400)
-          .json({ error: "Missing company information or document" });
+      if (!companyName || !gstin || !companyDoc || !billingCycle) {
+        return res.status(400).json({
+          error: "Missing company information, document, or billing cycle",
+        });
       }
 
       console.log("[UPLOAD] Uploading company doc...");
@@ -85,6 +90,7 @@ export const verifyRegisterAndCreateUser = async (req, res) => {
         gstin,
         verificationDocs: [docPath],
         storagePlan: plan,
+        billingCycle, // ✅ store in company
       });
 
       console.log("[USER] Creating company-admin user...");
@@ -92,20 +98,23 @@ export const verifyRegisterAndCreateUser = async (req, res) => {
         name: username,
         email,
         passwordHash,
-        role: "company-admin",
         phone,
         isVerified: true,
         plan,
-        companyId: company._id, // ✅ link company to user
+        billingCycle, // ✅ store in user
+        companyId: company._id,
+        role: "company-admin",
+        allowedRoles: ["company-admin"],
       });
 
-      // Optional: link user back to company as admin
       company.admin = user._id;
       await company.save();
     } else {
       const identityDoc = req.files?.identityDoc?.[0];
-      if (!identityDoc) {
-        return res.status(400).json({ error: "Missing identity document" });
+      if (!identityDoc || !billingCycle) {
+        return res
+          .status(400)
+          .json({ error: "Missing identity document or billing cycle" });
       }
 
       console.log("[UPLOAD] Uploading identity doc...");
@@ -116,13 +125,14 @@ export const verifyRegisterAndCreateUser = async (req, res) => {
         name: username,
         email,
         passwordHash,
-        role: "Individual",
-        verificationDoc: docPath, // ✅ store path only
         plan,
+        billingCycle, // ✅ store in user
+        role: "individual",
+        allowedRoles: ["individual"],
+        verificationDoc: docPath,
       });
     }
 
-    // Cleanup used OTPs
     await Otp.deleteMany({ email, purpose: "register" });
 
     console.log("[SUCCESS] User registered:", email);
@@ -226,6 +236,7 @@ export const verifyLoginOtp = async (req, res) => {
         email: user.email,
         name: user.name,
         role: user.role,
+        allowedRoles: user.allowedRoles,
         company: user.companyId ? user.companyId.toString() : null,
       },
     });
@@ -304,6 +315,189 @@ export const TransferAdminOwnership = async (req, res) => {
     res.json({ message: "Ownership transferred successfully" });
   } catch (error) {
     console.error("Ownership transfer failed:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// controllers/authController.js
+
+export const setUserRole = async (req, res) => {
+  try {
+    const { userId, role } = req.body;
+
+    if (!userId || !role)
+      return res.status(400).json({ message: "userId and role are required" });
+
+    const user = await User.findById(userId);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user.allowedRoles.includes(role)) {
+      return res
+        .status(403)
+        .json({ message: "This role is not allowed for this user." });
+    }
+
+    user.role = role;
+    await user.save();
+
+    return res.status(200).json({ message: "Role updated successfully", role });
+  } catch (error) {
+    console.error("Error setting role:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const upgradeUserAndPlan = async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const { selectedPlan, billingCycle, companyName, gstin } = req.body;
+
+    if (!selectedPlan || !billingCycle) {
+      return res
+        .status(400)
+        .json({ error: "Missing selected plan or billing cycle" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    let newRole = "";
+    if (selectedPlan === "individual") {
+      newRole = "individual";
+    } else if (["business", "business-plus"].includes(selectedPlan)) {
+      newRole = "company-admin";
+    } else {
+      return res.status(400).json({ error: "Invalid selected plan" });
+    }
+
+    const fileKey =
+      newRole === "company-admin" ? "verificationDoc" : "verificationDoc";
+    const uploadedFile = req.files?.[fileKey]?.[0];
+
+    if (!uploadedFile) {
+      return res
+        .status(400)
+        .json({ error: "Verification document is required" });
+    }
+
+    const { path: docPath } = await uploadToSupabase(uploadedFile);
+
+    // Update user allowed roles
+    if (!user.allowedRoles.includes(newRole)) {
+      user.allowedRoles.push(newRole);
+    }
+
+    // Update plan
+    user.plan = selectedPlan;
+
+    if (newRole === "individual") {
+      user.verificationDoc = docPath;
+      user.billingCycle = billingCycle;
+      user.status = "pending"; // default to pending for review
+    }
+
+    if (newRole === "company-admin") {
+      if (!companyName || !gstin) {
+        return res
+          .status(400)
+          .json({ error: "Company name and GSTIN are required" });
+      }
+
+      // Prevent duplicate companies
+      const existingCompany = await Company.findOne({ gstin });
+      if (existingCompany) {
+        return res
+          .status(400)
+          .json({ error: "Company with this GSTIN already exists" });
+      }
+
+      const newCompany = await Company.create({
+        name: companyName,
+        gstin,
+        storagePlan: selectedPlan,
+        billingCycle,
+        verificationDocs: [docPath],
+        admin: user._id,
+      });
+
+      user.companyId = newCompany._id;
+    }
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Plan upgraded successfully. Awaiting verification.",
+      data: {
+        id: user._id,
+        role: newRole,
+        allowedRoles: user.allowedRoles,
+        companyId: user.companyId || null,
+      },
+    });
+  } catch (err) {
+    console.error("[UPGRADE ERROR]", err);
+    res.status(500).json({ error: "Server error during plan upgrade" });
+  }
+};
+
+function calculateMembershipLeft(billingCycle, approvedAt) {
+  const now = new Date();
+  const approvedDate = new Date(approvedAt);
+  let expiryDate;
+
+  if (billingCycle === "yearly") {
+    expiryDate = new Date(
+      approvedDate.setFullYear(approvedDate.getFullYear() + 1)
+    );
+  } else {
+    expiryDate = new Date(approvedDate.setMonth(approvedDate.getMonth() + 1));
+  }
+
+  const daysLeft = Math.max(
+    Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24)),
+    0
+  );
+  return {
+    membershipLeft:
+      billingCycle === "yearly"
+        ? `${Math.floor(daysLeft / 30)} months of membership left`
+        : `${daysLeft} days of membership left`,
+    membershipDays: daysLeft,
+  };
+}
+
+// routes/auth.js or similar
+export const PlanExpiry = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).populate("companyId");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    let billingCycle, approvedAt;
+
+    if (user.role === "company-admin" && user.companyId) {
+      billingCycle = user.companyId.billingCycle;
+      approvedAt = user.companyId.approvedAt;
+    } else if (user.role === "individual") {
+      billingCycle = user.billingCycle;
+      approvedAt = user.approvedAt;
+    } else {
+      return res.status(400).json({ message: "Unsupported role" });
+    }
+
+    const { membershipLeft, membershipDays } = calculateMembershipLeft(
+      billingCycle,
+      approvedAt
+    );
+    console.log(
+      `[PLAN EXPIRY] User ${user._id} has ${membershipLeft} (${membershipDays} days left)`
+    );
+    return res.json({
+      membershipDays,
+    });
+  } catch (err) {
+    console.error("[MEMBERSHIP ERROR]", err);
     res.status(500).json({ message: "Server error" });
   }
 };

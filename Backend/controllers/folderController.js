@@ -15,7 +15,7 @@ export const VisibleFolders = async (req, res) => {
         companyId,
         allowedUsers: userId,
       });
-    } else if (role === "Individual") {
+    } else if (role === "individual") {
       folders = await Folder.find({ createdBy: userId });
     } else if (role === "client") {
       folders = []; // clients don’t see folder structure
@@ -175,7 +175,7 @@ export const GetFilesInFolder = async (req, res) => {
     const isClient = user.role === "client";
 
     const isIndividual =
-      user.role === "Individual" &&
+      user.role === "individual" &&
       String(folder.createdBy) === String(user._id);
 
     // 🔐 Strict check for client — deny if no assigned file in this folder

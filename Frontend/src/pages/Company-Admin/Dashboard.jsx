@@ -37,7 +37,7 @@ function Dashboard() {
   } = useQuery({
     queryKey: ["dashboardStats"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/auth/stats", {
+      const res = await axios.get("/auth/stats", {
         withCredentials: true,
       });
       return res.data;
@@ -51,7 +51,7 @@ function Dashboard() {
   } = useQuery({
     queryKey: ["sectionWiseStorage"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/files/section-wise-storage", {
+      const res = await axios.get("/files/section-wise-storage", {
         withCredentials: true,
       });
       return res.data.usage;

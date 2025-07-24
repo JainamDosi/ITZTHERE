@@ -37,30 +37,31 @@ const SuperAdminSidebar = () => {
   const { data: summary = {}, isLoading } = useQuery({
     queryKey: ["plan-summary"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/super-admin/plan-summary");
+      const res = await axios.get("/super-admin/plan-summary");
+     
       return res.data;
     },
     staleTime: 5 * 60 * 1000, // 5 mins caching
     refetchOnWindowFocus: false,
   });
 
-  const plansSummary = [
-    {
-      name: "Personal",
-      totalTaken: summary.individual || 0,
-      currentlyActive: summary.individual?.active || 0,
-    },
-    {
-      name: "Business",
-      totalTaken: summary.business || 0,
-      currentlyActive: summary.business?.active || 0,
-    },
-    {
-      name: "Business Plus",
-      totalTaken: summary.businessPlus || 0,
-      currentlyActive: summary.businessPlus?.active || 0,
-    },
-  ];
+ const plansSummary = [
+  {
+    name: "Personal",
+    totalTaken: summary?.plans?.individual?.total || 0,
+    currentlyActive: summary?.plans?.individual?.active || 0,
+  },
+  {
+    name: "Business",
+    totalTaken: summary?.plans?.business?.total || 0,
+    currentlyActive: summary?.plans?.business?.active || 0,
+  },
+  {
+    name: "Business Plus",
+    totalTaken: summary?.plans?.["business-plus"]?.total || 0,
+    currentlyActive: summary?.plans?.["business-plus"]?.active || 0,
+  },
+];
 
   return (
     <div className="bg-white/50 mt-2 ml-2 flex flex-col pb-2 w-72 px-3 justify-between transition-all duration-300">

@@ -9,7 +9,7 @@ export function AuthProvider({ children }) {
   // Fetch user info from backend on mount
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/auth/me", { withCredentials: true })
+      .get("/auth/me", { withCredentials: true })
       .then(res => setUser(res.data.user))
       .catch(() => setUser(null));
   }, []);
@@ -22,11 +22,11 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     setUser(null);
     // Call backend to clear cookie
-    await axios.post("http://localhost:3000/api/auth/logout", {}, { withCredentials: true });
+    await axios.post("/auth/logout", {}, { withCredentials: true });
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout,setUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -37,9 +37,7 @@ const CompanyCard = ({
           <FaBriefcase />
           <span>{employeeCount} Employees</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span>🕒 {membershipDays} days of membership left</span>
-        </div>
+        
         <div className="flex items-center gap-2">
           <span>Admin:- {admin}</span>
         </div>

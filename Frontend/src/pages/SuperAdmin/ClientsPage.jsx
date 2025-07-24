@@ -1,40 +1,48 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom"; 
+import { useLocation } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+
 import SuperAdminHeader from "../../components/SuperAdminHeader";
 import SuperAdminSidebar from "../../components/SuperAdminSidebar";
 import StatCard from "../../components/SuperAdminStatcard";
 import { FaCloud, FaFileAlt } from "react-icons/fa";
 import { Search } from "lucide-react";
 
-const clientData = [
-  {
-    name: "Client A",
-    affiliatedCompany: "Company A",
-    storageUsed: "0.49 GB",
-    docsUploaded: 110,
-  },
-  {
-    name: "Client B",
-    affiliatedCompany: "Company A",
-    storageUsed: "0.49 GB",
-    docsUploaded: 110,
-  },
-  {
-    name: "Client C",
-    affiliatedCompany: "Company B",
-    storageUsed: "0.49 GB",
-    docsUploaded: 110,
-  },
-];
+// Fetch grouped clients from backend
+const fetchGroupedClients = async () => {
+  const res = await axios.get("/super-admin/clients-grouped-by-company");
+  return res.data;
+};
 
 const ClientsPage = () => {
   const [search, setSearch] = useState("");
-  const location = useLocation(); 
+  const location = useLocation();
+  const companyName = location.state?.companyName;
 
-  const companyName = location.state?.companyName; 
+  const {
+    data: groupedClients,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["grouped-clients"],
+    queryFn: fetchGroupedClients,
+  });
 
-  
-  const filteredClients = clientData.filter(
+  // Flatten grouped structure into individual client objects
+  const flatClientData = groupedClients
+    ? groupedClients.flatMap((group) =>
+        group.clients.map((client) => ({
+          name: client.name,
+          affiliatedCompany: group.companyName,
+          docsUploaded: client.docsUploaded || 0,
+          storageUsed: client.storageUsed || "0 GB",
+        }))
+      )
+    : [];
+
+  // Apply search + optional filter by company
+  const filteredClients = flatClientData.filter(
     (client) =>
       client.name.toLowerCase().includes(search.toLowerCase()) &&
       (!companyName || client.affiliatedCompany === companyName)
@@ -71,29 +79,26 @@ const ClientsPage = () => {
 
           {/* Client Cards */}
           <div className="space-y-4">
-            {filteredClients.length > 0 ? (
+            {isLoading && <p className="text-gray-500">Loading clients...</p>}
+            {isError && <p className="text-red-500">Failed to fetch clients.</p>}
+
+            {!isLoading && !isError && filteredClients.length > 0 ? (
               filteredClients.map((client, idx) => (
                 <div key={idx} className="border border-gray-300 rounded-md p-4 shadow bg-white">
                   <h3 className="text-sm font-bold text-black mb-2">{client.name}</h3>
                   <div className="flex flex-wrap gap-4 text-sm text-black">
                     <div className="flex items-center gap-2">
-                      <FaCloud className="text-lg" />
-                      <span>{client.storageUsed} used of 4916GB</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <FaFileAlt className="text-lg" />
-                      <span>Documents Uploaded - {client.docsUploaded}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
                       <span className="text-xs text-gray-600">
-                        Affiliated with {client.affiliatedCompany}
+                        Affiliated with Comapny : - {client.affiliatedCompany}
                       </span>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-gray-500">No clients found.</p>
+              !isLoading && !isError && (
+                <p className="text-gray-500">No clients found.</p>
+              )
             )}
           </div>
         </div>

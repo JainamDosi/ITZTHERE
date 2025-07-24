@@ -7,6 +7,9 @@ import {
   Userinfo,
   UpdateProfile,
   TransferAdminOwnership,
+  setUserRole,
+  upgradeUserAndPlan,
+  PlanExpiry,
 } from "../controllers/authController.js";
 import jwt from "jsonwebtoken";
 import User from "../models/User.model.js";
@@ -77,5 +80,18 @@ router.get("/stats", protect, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+router.patch("/set-role", protect, setUserRole);
+
+router.patch(
+  "/upgrade-plan",
+  upload.fields([
+    { name: "identityDoc", maxCount: 1 },
+    { name: "verificationDoc", maxCount: 1 },
+  ]), // if you're using JWT
+  upgradeUserAndPlan
+);
+
+router.get("/plan-expiry", protect, PlanExpiry);
 
 export default router;

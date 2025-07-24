@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Navbar from "../components/navbar";
 import PlanCard from "../components/PlanCard";
 import FeatureCarousel from "../components/FeatureCarousel";
@@ -20,7 +20,6 @@ function Windo_landing() {
       title: "PERSONAL",
       desc: "For individuals",
       price: "Free",
-
       features: [
         "1 user",
         "1 GB storage",
@@ -33,7 +32,6 @@ function Windo_landing() {
       title: "BUSINESS",
       desc: "For small teams",
       price: "$19/month",
-     
       features: [
         "Up to 15 users & 20 clients",
         "5 GB storage",
@@ -48,7 +46,6 @@ function Windo_landing() {
       title: "BUSINESS +",
       desc: "For large teams",
       price: "$59/month",
-      
       features: [
         "Up to 25 users & 100 clients",
         "20 GB storage",
@@ -63,6 +60,8 @@ function Windo_landing() {
     }
   ];
 
+  const featuresRef = useRef(null); // 🔁 Added reference for Features section
+
   return (
     <div className="font-roboto text-gray-800">
       {/* Navbar */}
@@ -75,7 +74,10 @@ function Windo_landing() {
           <span className="text-[#2c787c]">ORGANIZE, CENTRALIZE</span> <br />
           AND <span className="text-[#2c787c]">SHARE DATA</span>
         </h2>
-        <button className="mt-2 px-6 py-2 bg-teal-400 text-white rounded-full hover:bg-teal-500 transition">
+        <button
+          onClick={() => featuresRef.current?.scrollIntoView({ behavior: "smooth" })}
+          className="mt-2 px-6 py-2 bg-teal-400 text-white rounded-full hover:bg-teal-500 transition"
+        >
           Explore Features
         </button>
       </section>
@@ -89,7 +91,7 @@ function Windo_landing() {
       </section>
 
       {/* Features */}
-      <section className="flex justify-center px-8 py-5 bg-white">
+      <section ref={featuresRef} className="flex justify-center px-8 py-5 bg-white">
         <FeatureCarousel />
       </section>
 

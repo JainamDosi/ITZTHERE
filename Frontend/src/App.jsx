@@ -82,7 +82,7 @@ function App() {
             </Route>
       
             {/* Individual Protected Routes */} 
-            <Route element={<ProtectedRoute allowedRoles={['Individual']} />}>
+            <Route element={<ProtectedRoute allowedRoles={['individual']} />}>
                 <Route path="/individual" element={<MainLayout_Individual />}>
                 <Route index element={<Dashboard_Individual />} />
                 <Route path="dashboard" element={<Dashboard_Individual />} />
@@ -91,7 +91,7 @@ function App() {
             </Route>
             </Route>
 
-            <Route element={<ProtectedRoute allowedRoles={['superadmin']} />}>
+            <Route element={<ProtectedRoute allowedRoles={['super-admin']} />}>
                   <Route path="/superadmin/dashboard" element={<SuperAdminDashboardPage />} />
                   <Route path="/superadmin/companies" element={<CompaniesPage />} />
                   <Route path="/superadmin/clients" element={<ClientsPage />} />
