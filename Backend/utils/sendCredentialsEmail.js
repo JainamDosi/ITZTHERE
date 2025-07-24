@@ -29,7 +29,7 @@ export const sendCredentialsEmail = async (to, name, email, password, role) => {
         <li><strong>Login Email:</strong> ${email}</li>
         <li><strong>Password:</strong> ${password}</li>
       </ul>
-      <p>Please login at <a href="http://localhost:5173/login">http://localhost:5173/login</a> and change your password after logging in.</p>
+      <p>Please login at <a href="http://localhost:5173/login">http://localhost:5173/login</a></p>
       <br/>
       <p>Regards,<br/>Team JD</p>
     `;
