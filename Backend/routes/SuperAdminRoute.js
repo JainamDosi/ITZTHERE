@@ -215,6 +215,7 @@ router.patch("/company-requests/:id", protect, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
 router.get("/plan-summary", protect, async (req, res) => {
   try {
     if (req.user.role !== "super-admin") {

@@ -10,7 +10,8 @@ import {
   FaIdCard,
 } from "react-icons/fa";
 import { Search } from "lucide-react";
-import { Mail, CalendarClock } from "lucide-react";
+import { Mail, CalendarClock,User  } from "lucide-react";
+
 import axios from "axios";
 const UsersPage = () => {
   const [userData, setUserData] = useState([]);
@@ -135,6 +136,10 @@ const UsersPage = () => {
                     <div className="flex items-center gap-2">
                       <FaCalendarAlt className="text-gray-500 w-4 h-4" />
                       <span>{user.membershipLeft}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                       <User className="text-gray-500 w-4 h-4" />
+                      <span>Role:-{user.role}</span>
                     </div>
                   </div>
                 </div>
