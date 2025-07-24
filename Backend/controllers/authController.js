@@ -160,7 +160,7 @@ export const loginPassword = async (req, res) => {
     }
 
     // ✅ Status-based checks before sending OTP
-    if (user.role === "Individual") {
+    if (user.role === "individual") {
       if (user.status === "pending") {
         return res
           .status(403)

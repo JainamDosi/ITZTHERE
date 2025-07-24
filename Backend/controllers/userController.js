@@ -28,7 +28,7 @@ export const createUserByCompanyAdmin = async (req, res) => {
 
     // 🔁 CASE 1: User already exists
     if (existingUser) {
-      if (["super-admin", "company-admin"].includes(existingUser.role)) {
+      if (["super-admin"].includes(existingUser.role)) {
         return res
           .status(400)
           .json({ message: "User is an admin and cannot be modified." });
