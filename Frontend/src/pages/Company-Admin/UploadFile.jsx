@@ -13,7 +13,7 @@ const UploadFile = () => {
   const { data: folders = [], isLoading, isError } = useQuery({
     queryKey: ["allowedFolders"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/folders/visible", {
+      const res = await axios.get("/folders/visible", {
         withCredentials: true,
       });
       return res.data.folders;
@@ -41,7 +41,7 @@ const UploadFile = () => {
     try {
       setIsUploading(true);
       const res = await axios.post(
-        "http://localhost:3000/api/files/upload",
+        "/files/upload",
         formData,
         {
           withCredentials: true,

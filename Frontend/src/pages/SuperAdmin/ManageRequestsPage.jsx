@@ -7,20 +7,20 @@ import SuperAdminHeader from "../../components/SuperAdminHeader";
 import SuperAdminSidebar from "../../components/SuperAdminSidebar";
 
 const fetchCompanyRequests = async () => {
-  const res = await axios.get("http://localhost:3000/api/super-admin/company-requests");
-  console.log("Fetched company requests:", res.data); // Log the fetched data
+  const res = await axios.get("/super-admin/company-requests");
+ 
   return res.data; // contains both company and individual requests
 };
 
 const patchCompanyStatus = async ({ id, status, type }) => {
-  await axios.patch(`http://localhost:3000/api/super-admin/company-requests/${id}`, {
+  await axios.patch(`/super-admin/company-requests/${id}`, {
     status,
     type,
   });
 };
 
 const fetchSignedUrl = async (fileId) => {
-  const res = await axios.get(`http://localhost:3000/api/super-admin/signed-url/${fileId}`);
+  const res = await axios.get(`/super-admin/signed-url/${fileId}`);
   return res.data.url;
 };
 

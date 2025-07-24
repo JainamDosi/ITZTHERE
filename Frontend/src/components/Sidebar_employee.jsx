@@ -24,7 +24,7 @@ const Sidebar_employee = () => {
   } = useQuery({
     queryKey: ["allowedFolders"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/folders/visible", {
+      const res = await axios.get("/folders/visible", {
         withCredentials: true,
       });
       return res.data.folders;

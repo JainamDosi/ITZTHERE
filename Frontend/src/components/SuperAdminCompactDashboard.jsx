@@ -18,10 +18,10 @@ const SuperAdminCompactDashboard = () => {
   const { data: companyData = [], isLoading, isError, error } = useQuery({
     queryKey: ["companies"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/super-admin/companies", {
+      const res = await axios.get("/super-admin/companies", {
         withCredentials: true,
       });
-      console.log("Fetched companies:", res.data); // Log the fetched data
+     
       return res.data;
     },
   });
@@ -41,17 +41,7 @@ const SuperAdminCompactDashboard = () => {
   return (
     <main className="flex flex-col w-full overflow-y-auto h-[calc(100vh-160px)] p-6 pt-2">
       {/* Top Stat Cards */}
-      <section className="flex flex-wrap gap-12 mb-8">
-        <StatCard
-          icon={<FaCloud />}
-          title="Storage"
-          progressBar={{
-            percent: (4253 / 4916) * 100,
-            label: "0.49 GB used of 1GB",
-          }}
-        />
-        <StatCard icon={<FaFileAlt />} title="Docs Uploaded" value="1253" />
-      </section>
+      
 
       {/* Search and Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">

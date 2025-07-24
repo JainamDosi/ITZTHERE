@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SuperAdminHeader from "../../components/SuperAdminHeader";
 import SuperAdminSidebar from "../../components/SuperAdminSidebar";
 import StatCard from "../../components/SuperAdminStatcard";
@@ -10,41 +10,35 @@ import {
   FaIdCard,
 } from "react-icons/fa";
 import { Search } from "lucide-react";
-
-const userData = [
-  {
-    name: "User A",
-    storageUsed: "0.49 GB",
-    totalStorage: "491GB",
-    docsUploaded: 110,
-    plan: "Monthly",
-    membershipLeft: "21 days of membership left",
-    membershipDays: 21,
-  },
-  {
-    name: "User B",
-    storageUsed: "0.49 GB",
-    totalStorage: "491GB",
-    docsUploaded: 110,
-    plan: "Annually",
-    membershipLeft: "7 months of membership left",
-    membershipDays: 210, // Approx. 7 months
-  },
-  {
-    name: "User C",
-    storageUsed: "0.49 GB",
-    totalStorage: "491GB",
-    docsUploaded: 110,
-    plan: "Monthly",
-    membershipLeft: "21 days of membership left",
-    membershipDays: 21,
-  },
-];
-
+import { Mail, CalendarClock } from "lucide-react";
+import axios from "axios";
 const UsersPage = () => {
+  const [userData, setUserData] = useState([]);
   const [search, setSearch] = useState("");
   const [filterPlan, setFilterPlan] = useState("All");
   const [sortOrder, setSortOrder] = useState("None");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await axios.get("/super-admin/users-summary",{
+        withCredentials: true,
+      }); 
+
+        
+        const data=res.data;
+ 
+        setUserData(data.users || []);
+      } catch (err) {
+        console.error("Error fetching users:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   // Filter + sort logic
   let filteredUsers = userData.filter((user) =>
@@ -73,28 +67,8 @@ const UsersPage = () => {
         </div>
 
         <div className="flex-1 h-full overflow-y-auto p-6 pt-2">
-          {/* Quick Stats */}
-          <section className="flex flex-wrap gap-12 mb-8">
-            <StatCard
-              icon={<FaCloud />}
-              title="Total Storage Used By Users"
-              progressBar={{
-                percent: (89 / 491) * 100,
-                label: "0.49 GB used of 4916GB",
-              }}
-            />
-            <StatCard
-              icon={<FaFileAlt />}
-              title="Total Documents Uploaded"
-              value={userData
-                .reduce((acc, u) => acc + u.docsUploaded, 0)
-                .toString()}
-            />
-          </section>
-
           {/* Controls */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-            {/* Search Bar */}
             <div className="flex items-center w-full sm:max-w-md bg-white border rounded shadow px-4 py-2">
               <div className="flex items-center gap-2">
                 <Search size={18} className="text-gray-400" />
@@ -113,7 +87,6 @@ const UsersPage = () => {
               </div>
             </div>
 
-            {/* Filter & Sort */}
             <div className="flex gap-4">
               <select
                 value={filterPlan}
@@ -121,8 +94,8 @@ const UsersPage = () => {
                 className="px-3 py-2 border rounded text-sm"
               >
                 <option value="All">All Plans</option>
-                <option value="Monthly">Monthly</option>
-                <option value="Annually">Annually</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Annually</option>
               </select>
 
               <select
@@ -138,38 +111,36 @@ const UsersPage = () => {
           </div>
 
           {/* User Cards */}
-          <div className="space-y-4">
-            {filteredUsers.map((user, idx) => (
-              <div
-                key={idx}
-                className="border border-gray-300 rounded-md p-4 shadow bg-white"
-              >
-                <h3 className="text-sm font-bold text-black mb-2">
-                  {user.name}
-                </h3>
-                <div className="flex flex-wrap gap-8 text-sm text-black">
-                  <div className="flex items-center gap-2">
-                    <FaCloud className="text-lg" />
-                    <span>
-                      {user.storageUsed} used of {user.totalStorage}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FaFileAlt className="text-lg" />
-                    <span>Documents Uploaded - {user.docsUploaded}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FaCalendarAlt className="text-lg" />
-                    <span>{user.plan}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FaIdCard className="text-lg" />
-                    <span>{user.membershipLeft}</span>
+          {loading ? (
+            <p className="text-sm text-gray-600">Loading users...</p>
+          ) : (
+            <div className="space-y-4">
+              {filteredUsers.map((user, idx) => (
+                <div
+                  key={idx}
+                  className="border border-gray-300 rounded-md p-4 shadow bg-white"
+                >
+                  <h3 className="text-sm font-bold text-black mb-1">
+                    {user.name}
+                  </h3>
+                  <div className="flex flex-wrap gap-6 text-sm text-black">
+                    <div className="flex items-center gap-2">
+                      <Mail className="text-gray-500 w-4 h-4" />
+                      <span>{user.email}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CalendarClock className="text-gray-500 w-4 h-4" />
+                      <span>{user.plan || "N/A"} Plan</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FaCalendarAlt className="text-gray-500 w-4 h-4" />
+                      <span>{user.membershipLeft}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@ import Navbar from '../components/navbar';
 import axios from 'axios';
 import OtpModal from '../components/OtpModal';
 import { toast } from 'react-toastify';
+import AlreadyRegisteredModal from '../components/AlreadyRegisteredModal ';
 
 const inputClass =
   'w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-pink-400';
@@ -47,7 +48,11 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [otpModalOpen, setOtpModalOpen] = useState(false);
   const [otp, setOtp] = useState('');
-
+  const [existingModalOpen, setExistingModalOpen] = useState(false);
+  const [existingRole, setExistingRole] = useState([]);
+  const [existingId, setExistingId] = useState('');
+  const [billingCycle, setBillingCycle] = useState('monthly'); // 'monthly' or 'yearly'
+  
   const [form, setForm] = useState({
     username: '',
     email: '',
@@ -88,7 +93,7 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:3000/api/auth/register/send-otp', {
+      const res = await axios.post('/auth/register/send-otp', {
         email: form.email,
       });
 
@@ -98,8 +103,21 @@ const Register = () => {
     } catch (error) {
       console.error('Error sending OTP:', error);
       const msg = error.response?.data?.error || 'Failed to send OTP';
-      toast.error(msg);
-    } finally {
+
+      // Check if email already exists and backend returns role
+      if (msg.includes('Email already exists')) {
+       
+
+
+        const role = error.response?.data?.allowedRole || []; // expect backend to send { error, role }
+        const userId = error.response?.data?.Id || ''; // expect backend to send { error, Id }
+        setExistingId(userId);
+        setExistingRole(role);
+        setExistingModalOpen(true);
+      } else {
+        toast.error(msg);
+      }}
+    finally {
       setLoading(false);
     }
   };
@@ -119,12 +137,16 @@ const Register = () => {
         formData.append('companyName', form.companyName);
         formData.append('gstin', form.gstin);
         formData.append('companyDoc', form.companyDoc);
+        formData.append('billingCycle', billingCycle); // ← add this
+
       } else {
         formData.append('identityDoc', form.identityDoc);
+        formData.append('billingCycle', billingCycle); // ← add this
+
       }
 
       const res = await axios.post(
-        'http://localhost:3000/api/auth/register/verify',
+        '/auth/register/verify',
         formData,
         {
           headers: {
@@ -145,7 +167,7 @@ const Register = () => {
 
   const handleResendOtp = async () => {
     try {
-      const res = await axios.post('http://localhost:3000/api/auth/register/send-otp', {
+      const res = await axios.post('/auth/register/send-otp', {
         email: form.email,
       });
       if (res.status === 200) {
@@ -217,54 +239,82 @@ const Register = () => {
                 Company Admin
               </label>
             </div>
+                      <div className="flex justify-center items-center mb-4 gap-2">
+            <span className={`text-sm font-medium ${billingCycle === 'monthly' ? 'text-pink-700' : 'text-gray-500'}`}>
+              Monthly
+            </span>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={billingCycle === 'yearly'}
+                onChange={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')}
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-600"></div>
+            </label>
+            <span className={`text-sm font-medium ${billingCycle === 'yearly' ? 'text-pink-700' : 'text-gray-500'}`}>
+              Yearly
+            </span>
+          </div>
+
 
                     {/* Plan Selection */}
-                    <div>
-          <h3 className="text-center font-semibold mb-2">Choose Your Plan</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+            <h3 className="text-center font-semibold mb-2">Choose Your Plan</h3>
+            
+            <div className="flex flex-wrap justify-center gap-4">
             {[
-              {
-                id: 'individual',
-                title: 'Individual',
-                price: '₹199/mo',
-                features: ['Basic Access'],
-                allowedUserTypes: ['individual'],
-              },
-              {
-                id: 'business',
-                title: 'Business',
-                price: '₹499/mo',
-                features: ['Team Access', 'Basic Analytics'],
-                allowedUserTypes: ['company'],
-              },
-              {
-                id: 'business-plus',
-                title: 'Business+',
-                price: '₹999/mo',
-                features: ['All Features', 'Priority Support'],
-                allowedUserTypes: ['company'],
-              },
-            ]
-              .filter((plan) => plan.allowedUserTypes.includes(form.userType))
-              .map((plan) => (
+            {
+              id: 'individual',
+              title: 'Individual',
+              monthly: 199,
+              yearly: 199 * 12 * 0.5, // 20% discount
+              features: ['Basic Access'],
+              allowedUserTypes: ['individual'],
+            },
+            {
+              id: 'business',
+              title: 'Business',
+              monthly: 499,
+              yearly: 499 * 12 * 0.5,
+              features: ['Team Access', 'Basic Analytics'],
+              allowedUserTypes: ['company'],
+            },
+            {
+              id: 'business-plus',
+              title: 'Business+',
+              monthly: 999,
+              yearly: 999 * 12 * 0.5,
+              features: ['All Features', 'Priority Support'],
+              allowedUserTypes: ['company'],
+            },
+          ]
+            .filter((plan) => plan.allowedUserTypes.includes(form.userType))
+            .map((plan) => {
+              const price = billingCycle === 'monthly' ? plan.monthly : plan.yearly;
+              return (
                 <div
                   key={plan.id}
                   onClick={() => setForm({ ...form, plan: plan.id })}
-                  className={`cursor-pointer border rounded-lg p-4 shadow-sm transition-all duration-200 hover:shadow-md ${
+                  className={`w-64 cursor-pointer border rounded-lg p-4 shadow-sm transition-all duration-200 hover:shadow-md ${
                     form.plan === plan.id ? 'border-pink-600 bg-pink-100' : 'border-gray-300'
                   }`}
                 >
                   <h4 className="text-sm font-bold mb-1">{plan.title}</h4>
-                  <p className="text-xs mb-2 text-gray-600">{plan.price}</p>
+                  <p className="text-xs mb-2 text-gray-600">
+                    ₹{price.toFixed(0)}/{billingCycle}
+                  </p>
                   <ul className="text-xs text-gray-500 space-y-1">
                     {plan.features.map((f, i) => (
                       <li key={i}>• {f}</li>
                     ))}
                   </ul>
                 </div>
-              ))}
+              );
+            })}
+
+            </div>
           </div>
-        </div>
 
             {/* Company Fields */}
             {form.userType === 'company' && (
@@ -329,6 +379,13 @@ const Register = () => {
         onVerify={handleOtpVerify}
         onResend={handleResendOtp}
       />
+            <AlreadyRegisteredModal
+        open={existingModalOpen}
+        role={existingRole}
+        userId={existingId}
+        onClose={() => setExistingModalOpen(false)}
+      />
+
     </>
   );
 };

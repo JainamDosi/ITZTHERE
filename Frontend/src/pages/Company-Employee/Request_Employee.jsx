@@ -11,7 +11,7 @@ const RequestAccess = () => {
   const { data: folders = [] } = useQuery({
     queryKey: ["requestableFolders"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/folders/requestable", {
+      const res = await axios.get("/folders/requestable", {
         withCredentials: true,
       });
       return res.data.folders;
@@ -22,7 +22,7 @@ const RequestAccess = () => {
   const { data: history = [] } = useQuery({
     queryKey: ["accessRequests"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/access-requests/my", {
+      const res = await axios.get("/access-requests/my", {
         withCredentials: true,
       });
       return res.data.requests;
@@ -33,7 +33,7 @@ const RequestAccess = () => {
   const { mutate } = useMutation({
     mutationFn: async (folderId) => {
       return await axios.post(
-        "http://localhost:3000/api/access-requests",
+        "/access-requests",
         { folderId },
         { withCredentials: true }
       );

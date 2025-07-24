@@ -16,6 +16,12 @@ const companySchema = new mongoose.Schema({
   },
   gstin: { type: String, required: true }, // GST number for Indian companies
   createdAt: { type: Date, default: Date.now },
+  approvedAt: { type: Date },
+  billingCycle: {
+    type: String,
+    enum: ["monthly", "yearly"],
+    default: "monthly",
+  },
 });
 const Company = mongoose.model("Company", companySchema);
 

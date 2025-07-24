@@ -9,7 +9,7 @@ const UploadTrendsChart = () => {
   const { data, isLoading, isError } = useQuery({
   queryKey: ["uploadTrends", page],
   queryFn: async () => {
-    const res = await axios.get(`http://localhost:3000/api/files/daily-uploads?page=${page}&limit=7`, {
+    const res = await axios.get(`/files/daily-uploads?page=${page}&limit=7`, {
       withCredentials: true,
     });
     return res.data.data;
