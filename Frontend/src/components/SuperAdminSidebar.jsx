@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -8,6 +8,7 @@ import companiesIcon from "../assets/companies.png";
 import clientsIcon from "../assets/clients.png";
 import usersIcon from "../assets/users.png";
 import requestsIcon from "../assets/requests.png";
+import EditProfileModal from "./EditProfileModal";
 
 import { useAuth } from "../context/AuthContext";
 import { Edit2, Briefcase } from "lucide-react";
@@ -15,7 +16,8 @@ import { Edit2, Briefcase } from "lucide-react";
 const SuperAdminSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const {user}=useAuth();
+  const {user,setUser}=useAuth();
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   const [activeItem, setActiveItem] = React.useState("");
 
@@ -75,7 +77,7 @@ const SuperAdminSidebar = () => {
             <h2 className="font-semibold text-sm text-black">{user.name}</h2>
             <p className="text-xs text-black">{user.email}</p>
           </div>
-          <Edit2 className="text-black cursor-pointer hover:text-gray-700 text-base" />
+          <Edit2 className="text-black cursor-pointer hover:text-gray-700 text-base"   onClick={() => setEditModalOpen(true)} />
         </div>
 
         {/* Navigation Menu */}
@@ -126,6 +128,14 @@ const SuperAdminSidebar = () => {
           </div>
         </div>
       </div>
+        <EditProfileModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        user={user}
+        setUser={setUser}
+      />
+
+
     </div>
   );
 };
