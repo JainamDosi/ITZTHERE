@@ -95,6 +95,8 @@ const Register = () => {
     try {
       const res = await axios.post('/auth/register/send-otp', {
         email: form.email,
+      }, {
+        withCredentials: true,
       });
 
       if (res.status === 200) {
@@ -152,7 +154,9 @@ const Register = () => {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
-        }
+        }, {
+        withCredentials: true,
+      }
       );
 
       if (res.status === 200) {
@@ -169,6 +173,8 @@ const Register = () => {
     try {
       const res = await axios.post('/auth/register/send-otp', {
         email: form.email,
+      }, {
+        withCredentials: true,
       });
       if (res.status === 200) {
         console.log('OTP re-sent');

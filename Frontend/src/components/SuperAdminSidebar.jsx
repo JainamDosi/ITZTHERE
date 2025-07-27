@@ -39,7 +39,9 @@ const SuperAdminSidebar = () => {
   const { data: summary = {}, isLoading } = useQuery({
     queryKey: ["plan-summary"],
     queryFn: async () => {
-      const res = await axios.get("/super-admin/plan-summary");
+      const res = await axios.get("/super-admin/plan-summary", {
+        withCredentials: true,
+      });
      
       return res.data;
     },

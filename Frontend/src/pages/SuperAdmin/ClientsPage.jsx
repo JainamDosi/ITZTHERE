@@ -11,7 +11,9 @@ import { Search } from "lucide-react";
 
 // Fetch grouped clients from backend
 const fetchGroupedClients = async () => {
-  const res = await axios.get("/super-admin/clients-grouped-by-company");
+  const res = await axios.get("/super-admin/clients-grouped-by-company", {
+        withCredentials: true,
+      });
   return res.data;
 };
 
