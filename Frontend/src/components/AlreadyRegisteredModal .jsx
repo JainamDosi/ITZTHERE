@@ -99,6 +99,8 @@ const AlreadyRegisteredModal = ({ open, role, userId, onClose }) => {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+      }, {
+        withCredentials: true,
       });
 
       if (res.data.success) {

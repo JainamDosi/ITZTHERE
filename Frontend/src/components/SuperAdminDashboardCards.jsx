@@ -11,13 +11,17 @@ import usersIcon from "../assets/users.png";
 import { PieChart } from "react-minimal-pie-chart";
 
 const fetchEnrollments = async () => {
-  const res = await axios.get("/super-admin/enrollments");
+  const res = await axios.get("/super-admin/enrollments", {
+        withCredentials: true,
+      });
  
   return res.data;
 };
 
 const fetchStorageStats = async () => {
-  const res = await axios.get("/super-admin/storage");
+  const res = await axios.get("/super-admin/storage", {
+        withCredentials: true,
+      });
 
   return res.data;
 };

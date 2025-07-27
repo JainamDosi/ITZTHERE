@@ -90,6 +90,8 @@ const Login = () => {
       const res = await axios.patch(`/auth/set-role`, {
         userId: tempUser.id,
         role: selectedRole,
+      }, {
+        withCredentials: true,
       });
       const updatedUser = { ...tempUser, role: selectedRole };
       login(updatedUser);

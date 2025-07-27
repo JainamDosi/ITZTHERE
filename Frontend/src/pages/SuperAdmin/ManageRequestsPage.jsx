@@ -7,7 +7,9 @@ import SuperAdminHeader from "../../components/SuperAdminHeader";
 import SuperAdminSidebar from "../../components/SuperAdminSidebar";
 
 const fetchCompanyRequests = async () => {
-  const res = await axios.get("/super-admin/company-requests");
+  const res = await axios.get("/super-admin/company-requests", {
+        withCredentials: true,
+      });
  
   return res.data; // contains both company and individual requests
 };
@@ -16,11 +18,15 @@ const patchCompanyStatus = async ({ id, status, type }) => {
   await axios.patch(`/super-admin/company-requests/${id}`, {
     status,
     type,
-  });
+  }, {
+        withCredentials: true,
+      });
 };
 
 const fetchSignedUrl = async (fileId) => {
-  const res = await axios.get(`/super-admin/signed-url/${fileId}`);
+  const res = await axios.get(`/super-admin/signed-url/${fileId}`, {
+        withCredentials: true,
+      });
   return res.data.url;
 };
 
