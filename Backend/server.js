@@ -29,7 +29,7 @@ app.use("/api/access-requests", accessRequestRoutes);
 app.use("/api/super-admin", SuperAdminRoute);
 
 mongoose.connect(process.env.MONGO_URI).then(() => {
-  app.listen(3000, () =>
+  app.listen(process.env.PORT || 3000;, () =>
     console.log("Server running on http://localhost:3000")
   );
 });
