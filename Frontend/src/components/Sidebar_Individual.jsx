@@ -17,6 +17,8 @@ const Sidebar_Individual = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newFolder, setNewFolder] = useState("");
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+
 
   const { data: companyFolders = [], isLoading, isError } = useQuery({
     queryKey: ["visibleFolders"],
@@ -32,6 +34,8 @@ const Sidebar_Individual = () => {
 
   const handleAddFolder = async () => {
     if (!newFolder.trim()) return;
+    setIsCreatingFolder(true);
+
     try {
       await axios.post(
         "/folders/create",
@@ -44,6 +48,8 @@ const Sidebar_Individual = () => {
     } catch (err) {
       console.error("Failed to create folder:", err);
       alert("Error creating folder");
+    }finally{
+      setIsCreatingFolder(false);
     }
   };
 
@@ -140,12 +146,16 @@ const Sidebar_Individual = () => {
               className="w-full border border-gray-300 rounded px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-pink-500"
               placeholder="Folder name"
             />
-            <button
-              onClick={handleAddFolder}
-              className="w-full bg-pink-700 text-white py-2 rounded font-semibold hover:bg-pink-800 transition"
-            >
-              Create Folder
-            </button>
+                      <button
+            onClick={handleAddFolder}
+            disabled={isCreatingFolder}
+            className={`w-full text-white py-2 rounded font-semibold transition
+              ${isCreatingFolder ? "bg-pink-400 cursor-not-allowed" : "bg-pink-700 hover:bg-pink-800"}
+            `}
+          >
+            {isCreatingFolder ? "Creating..." : "Create Folder"}
+          </button>
+
           </div>
         </div>
       )}
