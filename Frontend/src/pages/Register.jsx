@@ -273,24 +273,24 @@ const Register = () => {
             {
               id: 'individual',
               title: 'Individual',
-              monthly: 199,
-              yearly: 199 * 12 * 0.5, // 20% discount
+              monthly: 0,
+              yearly: 0, // 20% discount
               features: ['Basic Access'],
               allowedUserTypes: ['individual'],
             },
             {
               id: 'business',
               title: 'Business',
-              monthly: 499,
-              yearly: 499 * 12 * 0.5,
+              monthly: 0,
+              yearly: 0,
               features: ['Team Access', 'Basic Analytics'],
               allowedUserTypes: ['company'],
             },
             {
               id: 'business-plus',
               title: 'Business+',
-              monthly: 999,
-              yearly: 999 * 12 * 0.5,
+              monthly: 0,
+              yearly: 0,
               features: ['All Features', 'Priority Support'],
               allowedUserTypes: ['company'],
             },
@@ -373,6 +373,12 @@ const Register = () => {
             >
               {loading ? 'Sending OTP...' : 'Register'}
             </button>
+
+              <p className="text-center text-xs text-gray-500 mt-2 italic">
+              All plans are currently in trial version.
+            </p>
+
+
           </form>
         </div>
       </div>

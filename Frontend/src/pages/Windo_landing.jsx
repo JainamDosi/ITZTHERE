@@ -5,8 +5,8 @@ import FeatureCarousel from "../components/FeatureCarousel";
 
 function Windo_landing() {
   const faqs = [
-    { question: "What is your refund policy?", answer: "We offer a 30-day refund policy." },
-    { question: "How do I contact support?", answer: "Email us at support@example.com." },
+    { question: "What is your refund policy?", answer: "We offer a 7-day refund policy." },
+    { question: "How do I contact support?", answer: "Email us at support@itzthere.com." },
     { question: "Can I upgrade later?", answer: "Yes, you can upgrade at any time." }
   ];
 
@@ -16,49 +16,53 @@ function Windo_landing() {
   };
 
   const plans = [
-    {
-      title: "PERSONAL",
-      desc: "For individuals",
-      price: "Free",
-      features: [
-        "1 user",
-        "1 GB storage",
-        "Basic document upload",
-        "View-only access",
-        "Email support"
-      ]
-    },
-    {
-      title: "BUSINESS",
-      desc: "For small teams",
-      price: "$19/month",
-      features: [
-        "Up to 15 users & 20 clients",
-        "5 GB storage",
-        "Unlimited signature requests",
-        "PDF editing",
-        "Set up admins",
-        "Track shared content usage",
-        "Role-based access control"
-      ]
-    },
-    {
-      title: "BUSINESS +",
-      desc: "For large teams",
-      price: "$59/month",
-      features: [
-        "Up to 25 users & 100 clients",
-        "20 GB storage",
-        "Unlimited signature requests",
-        "PDF editing",
-        "Set up multiple admins",
-        "Track shared content",
-        "Advanced folder permissions",
-        "Audit logs & priority support",
-        "Custom branding"
-      ]
-    }
-  ];
+  {
+    title: "PERSONAL",
+    desc: "For individuals",
+    price: "₹0",
+    trial: true,
+    features: [
+      "1 user",
+      "1 GB storage",
+      "Basic document upload",
+      "View-only access",
+      "Email support"
+    ]
+  },
+  {
+    title: "BUSINESS",
+    desc: "For small teams",
+    price: "₹0",
+    trial: true,
+    features: [
+      "Up to 15 users & 20 clients",
+      "5 GB storage",
+      "Unlimited signature requests",
+      "PDF editing",
+      "Set up admins",
+      "Track shared content usage",
+      "Role-based access control"
+    ]
+  },
+  {
+    title: "BUSINESS +",
+    desc: "For large teams",
+    price: "₹0",
+    trial: true,
+    features: [
+      "Up to 25 users & 100 clients",
+      "20 GB storage",
+      "Unlimited signature requests",
+      "PDF editing",
+      "Set up multiple admins",
+      "Track shared content",
+      "Advanced folder permissions",
+      "Audit logs & priority support",
+      "Custom branding"
+    ]
+  }
+];
+
 
   const featuresRef = useRef(null); // 🔁 Added reference for Features section
 
