@@ -14,7 +14,7 @@ dotenv.config();
 const app = express();
 app.use(
   cors({
-    origin: "https://itzthere.vercel.app", // your frontend URL
+    origin: "https://www.itzthere.com", // your frontend URL
     credentials: true,
   })
 );
