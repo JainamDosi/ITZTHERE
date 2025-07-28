@@ -20,18 +20,13 @@ const features = [
   },
   {
     title: '2FA Authentication',
-    description: 'Protect accounts with email and phone OTP-based 2FA.',
+    description: 'Protect accounts with email OTP-based 2FA.',
     icon: <FiShield className="text-4xl text-red-500" />
   },
   {
     title: 'Role-Based Access',
     description: 'Clients and employees see only what they are allowed.',
     icon: <FiUsers className="text-4xl text-yellow-500" />
-  },
-  {
-    title: 'Cloud Storage with Metadata',
-    description: 'Store files on Cloudinary/Storj and manage with MongoDB.',
-    icon: <MdOutlineStorage className="text-4xl text-blue-500" />
   }
 ];
 
