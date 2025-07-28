@@ -1,5 +1,5 @@
 import React from "react";
-
+import { Link } from "react-router-dom"; 
 const PlanCard = ({ title, desc, features, price, trial }) => (
   <div className="relative flex flex-col justify-between bg-white rounded-3xl p-8 text-gray-800 border border-gray-200 shadow-md hover:shadow-xl transition-transform duration-300 transform hover:-translate-y-1">
     
@@ -22,16 +22,14 @@ const PlanCard = ({ title, desc, features, price, trial }) => (
       </ul>
 
       {/* Optional trial note */}
-      {trial && (
-        <p className="mt-4 text-xs text-yellow-600 italic">
-          * This is a trial version with limited features.
-        </p>
-      )}
+    
     </div>
 
-    <button className="mt-8 bg-pink-700 text-white font-medium px-5 py-3 rounded-xl hover:bg-teal-700 transition duration-200">
-      Start Free Trial
-    </button>
+        <Link to="/register">
+      <button className="mt-8 bg-pink-700 text-white font-medium px-5 py-3 rounded-xl hover:bg-teal-700 transition duration-200">
+        Start Trial
+      </button>
+    </Link>
   </div>
 );
 
